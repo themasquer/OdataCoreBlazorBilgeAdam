@@ -1,0 +1,354 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>ODataApi Test Sayfası</title>
+    <style>
+        li {
+            padding-top: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h3>ODataApi Test Sayfası</h3>
+    OData sorguları üzerinden büyük küçük harf duyarsız sorgulama yapılabilir.
+    <hr />
+    Migrations: <a href="/api/Migrations">İlk Verileri Oluştur</a>
+    <hr />
+    <ul>
+        <li>
+            <a href="/odata/$metadata" target="_blank">/odata/$metadata</a>
+        </li>
+    </ul>
+    <hr />
+    <b>Oyunlar</b>
+    <ul>
+        <li>
+            <a href="/odata/oyunlar" target="_blank">/odata/oyunlar</a>
+        </li>
+        <li>
+            SELECT
+            <br />
+            <a href="/odata/oyunlar?$select=adi" target="_blank">/odata/oyunlar?$select=adi</a>
+            <br />
+            <a href="/odata/oyunlar?$select=adi,tarihi,puani" target="_blank">/odata/oyunlar?$select=adi,tarihi,puani</a>
+            <br />
+            Sorgudan dönen property'leri filtrelemek için kullanılır. Virgül ile birden çok özellik kullanılabilir.
+            <br />
+            Kullanabilmek için ~/Proje/Configs/OdataConfig.cs Configure methodunda app.UseEndpoints(endpoints =>) içerisine endpoints.Select(); eklenmelidir.
+        </li>
+        <li>
+            EXPAND
+            <br />
+            <a href="/odata/oyunlar?$expand=yapimci" target="_blank">/odata/oyunlar?$expand=yapimci</a>
+            <br />
+            <a href="/odata/oyunlar?$expand=yapimci($select=adi)" target="_blank">/odata/oyunlar?$expand=yapimci($select=adi)</a>
+            <br />
+            Sorgudan dönen modelde navigation property bulunuyorsa bu property'nin de verisini alabilme imkanı sunar. Virgül ile birden çok navigasyon özelliği kullanılabilir.
+            <br />
+            Expand ile dönen navigasyon verisi üzerinden de select ile özellik adı filtrelemesi yapılabilir, birden çok özellik virgül ile yazılabilir.
+            <br />
+            Kullanabilmek için ~/Proje/Configs/OdataConfig.cs Configure methodunda app.UseEndpoints(endpoints =>) içerisine endpoints.Expand(); eklenmelidir.
+        </li>
+        <li>
+            ORDERBY
+            <br />
+            <a href="/odata/oyunlar?$orderby=adi asc" target="_blank">/odata/oyunlar?$orderby=adi asc</a>
+            <br />
+            <a href="/odata/oyunlar?$orderby=tarihi desc,adi asc" target="_blank">/odata/oyunlar?$orderby=tarihi desc,adi asc</a>
+            <br />
+            Sorgudan dönen verinin bir veya virgülle ayrılmış birden çok özelliğe göre sıralanmasını sağlar. Ascending (artan sıralama) için asc, descending (azalan sıralama) için ise desc kullanılır.
+            <br />
+            Kullanabilmek için ~/Proje/Configs/OdataConfig.cs Configure methodunda app.UseEndpoints(endpoints =>) içerisine endpoints.OrderBy(); eklenmelidir.
+        </li>
+        <li>
+            TOP
+            <br />
+            <a href="/odata/oyunlar?$top=3" target="_blank">/odata/oyunlar?$top=3</a>
+            <br />
+            Sorgudan dönen veriden ilk kaç adet istendiğinin belirtilmesi için kullanılır.
+            <br />
+            Kullanabilmek için ~/Proje/Configs/OdataConfig.cs Configure methodunda app.UseEndpoints(endpoints =>) içerisine endpoints.MaxTop(kayıt adedi); eklenmelidir.
+            <br />
+            Sınırlama olmadan kullanabilmek için parametre olarak null gönderilir.
+        </li>
+        <li>
+            SKIP
+            <br />
+            <a href="/odata/oyunlar?$skip=2" target="_blank">/odata/oyunlar?$skip=2</a>
+            <br />
+            <a href="/odata/oyunlar?$skip=2&$top=3" target="_blank">/odata/oyunlar?$skip=2&$top=3</a>
+            <br />
+            Sorgudan çekilen veriler üzerinde atlama yapmak için kullanılır. TOP ile beraber kullanılarak sayfalama yapılabilir.
+            <br />
+            SKIP kullanabilmek için endpoint kısmında herhangi bir ekleme yapmaya gerek yoktur.
+            <br />
+            Birden çok filtre & ile birleştirilerek kullanılabilir.
+        </li>
+        <li>
+            COUNT
+            <br />
+            <a href="/odata/oyunlar?$count=true" target="_blank">/odata/oyunlar?$count=true</a>
+            <br />
+            Sorgudan çekilen kayıt adedini almak için kullanılır.
+            <br />
+            Kullanabilmek için ~/Proje/Configs/OdataConfig.cs Configure methodunda app.UseEndpoints(endpoints =>) içerisine endpoints.Count(); eklenmelidir.
+            <br />
+            Dönen sonuçta @odata.count kaç kayıt olduğunu gösterir.
+        </li>
+        <li>
+            FILTER
+            <br />
+            Sorgudan çekilen kayıtlarda filtreleme yapmak için kullanılır.
+            <br />
+            Kullanabilmek için ~/Proje/Configs/OdataConfig.cs Configure methodunda app.UseEndpoints(endpoints =>) içerisine endpoints.Filter(); eklenmelidir.
+            <br />
+            Mantıksal ve artimetik operatörler ile fonksiyonlar üzerinden filtreleme yapılabilir.
+            <br />
+            <b>Mantıksal (Logical) Operatörler:</b>
+            <br />
+            and : And
+            <br />
+            or : Or
+            <br />
+            not : Not
+            <br />
+            eq : Equal
+            <br />
+            ne : Not Equal
+            <br />
+            gt : Greather Than
+            <br />
+            ge : Greather Than or Equal
+            <br />
+            lt : Less Than
+            <br />
+            le : Less Than or Equal
+            <br />
+            Birden çok filtre and ve or operatörleri ile birlikte kullanılabilir.
+            <br />
+            <a href="/odata/oyunlar?$filter=adi eq 'red dead redemption 2'" target="_blank">/odata/oyunlar?$filter=adi eq 'red dead redemption 2'</a>
+            <br />
+            <a href="/odata/oyunlar?$filter=tarihi ge 2010-01-01T00:00:00.00Z and puani gt 89" target="_blank">/odata/oyunlar?$filter=tarihi ge 2010-01-01T00:00:00.00Z and puani gt 89</a>
+            <br />
+            <b>Aritmetik (Arithmetic) Operatörler:</b>
+            <br />
+            add : Toplama
+            <br />
+            sub : Çıkarma
+            <br />
+            mul : Çarpma
+            <br />
+            div : Bölme
+            <br />
+            mod : Kalan
+            <br />
+            Diğer Matematik Fonksiyonları: round, floor, ceiling
+            <br />
+            <a href="/odata/oyunlar?$filter=puani add 5 lt 90" target="_blank">/odata/oyunlar?$filter=puani add 5 lt 90</a> (Puana 5 ekleyerek 90'dan küçük olanları döner.)
+            <br />
+            <b>Fonksiyonlar (Functions):</b>
+            <br />
+            endswith : Bir string ifadenin sonunun filtrelenmesi için kullanılır.
+            <br />
+            <a href="/odata/oyunlar?$filter=endswith(adi, 'offensive')" target="_blank">/odata/oyunlar?$filter=endswith(adi, 'offensive')</a>
+            <br />
+            startswith : Bir string ifadenin başının filtrelenmesi için kullanılır.
+            <br />
+            <a href="/odata/oyunlar?$filter=startswith(adi, 'battlefield')" target="_blank">/odata/oyunlar?$filter=startswith(adi, 'battlefield')</a>
+            <br />
+            length : Bir string ifadenin uzunluğunu filtrelemek için kullanılır.
+            <br />
+            <a href="/odata/oyunlar?$filter=length(adi) le 11" target="_blank">/odata/oyunlar?$filter=length(adi) le 11</a>
+            <br />
+            indexof : Bir string ifadenin içindeki bir karakterin index'ini filtrelemek için kullanılır.
+            <br />
+            <a href="/odata/oyunlar?$filter=indexof(adi, 'r') ge 0" target="_blank">/odata/oyunlar?$filter=indexof(adi, 'r') ge 0</a>
+            <br />
+            trim : Bir string ifadenin başındaki ve sonundaki boşlukları temizleyerek filtreleme yapmak için kullanılır.
+            <br />
+            <a href="/odata/oyunlar?$filter=trim(adi) eq 'red dead redemption 2'" target="_blank">/odata/oyunlar?$filter=trim(adi) eq 'red dead redemption 2'</a>
+            <br />
+            Diğer String Fonksiyonları: contains, concat, substring, tolower, toupper
+            <br />
+            year : Bir tarih ifadenin yılını filtrelemek için kullanılır.
+            <br />
+            month : Bir tarih ifadenin ayını filtrelemek için kullanılır.
+            <br />
+            day : Bir tarih ifadenin gününü filtrelemek için kullanılır.
+            <br />
+            Diğer Tarih Fonksiyonları: date, time, hour, minute, second, fractionalseconds
+            <br />
+            <a href="/odata/oyunlar?$filter=year(tarihi) eq 2002&month(tarihi) eq 9&day(tarihi) eq 10" target="_blank">/odata/oyunlar?$filter=year(tarihi) eq 2002&month(tarihi) eq 9&day(tarihi) eq 10</a>
+            <br />
+            Diğer Fonksiyonlar: cast, isof, any, all
+            <br />
+            <br />
+            OData ile kullanılabilecek diğer sorgu yapıları: $format, $skiptoken, $deltatoken
+        </li>
+    </ul>
+    <b>Yorumlar</b>
+    <ul>
+        <li>
+            QUERY OPTIONS
+            <br />
+            <a href="/odata/yorumlar?$orderby=tarihi asc,yorumcuadi asc&$filter=tarihi ge 2010-01-01T00:00:00.00Z" target="_blank">
+                /odata/yorumlar?$orderby=tarihi asc,yorumcuadi asc&$filter=tarihi ge 2010-01-01T00:00:00.00Z
+            </a>
+            <br />
+            Kullanabilmek için ilgili controller action'ına ODataQueryOptions tipinde bir parametre gönderilmelidir. Bu durumda EnableQuery attribute'unu kullanmaya gerek yoktur.
+        </li>
+        <li>
+            AKSİYONLARDA PARAMETRE KULLANIMI VE CUSTOM ROUTE
+            <br />
+            <a href="/odata/yorumlar(1)" target="_blank">/odata/yorumlar(1)</a>
+            <br />
+            <br />
+            İstenilen OData sorgu yapıları ($select, $expand, $filter, $orderby, vb.) kullanılabilir.
+        </li>
+    </ul>
+    <b>Yapımcılar</b>
+    <ul>
+        <li>
+            PAGINATION
+            <br />
+            <a href="/odata/yapimcilar" target="_blank">/odata/yapimcilar</a>
+            <br />
+            Sorgu sonucunda gelen veri ile birlikte bir sonraki sayfadaki verileri getirebilmek için "@odata.nextLink": "https://localhost:44327/odata/yapimcilar?$skip=2" link'i de döner.
+            <br />
+            Next Link Örnek: <a href="https://localhost:44327/odata/yapimcilar?$skip=2" target="_blank">https://localhost:44327/odata/yapimcilar?$skip=2</a>
+        </li>
+        <li>
+            ANAHTAR (ID) ÜZERİNDEN KAYIT ÇEKME
+            <br />
+            <a href="/odata/yapimcilar(2)" target="_blank">/odata/yapimcilar(2)</a>
+        </li>
+        <li>
+            FUNCTION'LAR
+            <br />
+            Öncelikle function adına göre ~/Proje/Configs/OdataConfig.cs Configure methodunda ekleme yapılmalıdır.
+            <br />
+            Function'lar GET methodu ile kullanılır.
+            <br />
+            1) Parametresiz Function'lar
+            <br />
+            <a href="/odata/yapimcilar/tumyapimcilar" target="_blank">/odata/yapimcilar/tumyapimcilar</a>
+            <br />
+            <a href="/odata/yapimcilar/tumyapimcisayisi" target="_blank">/odata/yapimcilar/tumyapimcisayisi</a>
+            <br />
+            2) Parametreli Function'lar
+            <br />
+            <a href="/odata/yapimcilar/yapimciadinagoregetir(yapimciadi='Valve')" target="_blank">/odata/yapimcilar/yapimciadinagoregetir(yapimciadi='Valve')</a>
+        </li>
+    </ul>
+    <b>Yapimci Oyun Yorumlar</b>
+    <ul>
+        <li>
+            FUNCTION'LAR (Devam)
+            <br />
+            2) Parametreli Function'lar (Devam)
+            <br />
+            <a href="/odata/yapimcioyunyorumlar/oyuntarihinegoregetir(oyunbaslangictarihi=2000-01-01T00:00:00.00Z,oyunbitistarihi=2009-12-31T23:59:59.00Z)" target="_blank">/odata/yapimcioyunyorumlar/oyuntarihinegoregetir(oyunbaslangictarihi=2000-01-01T00:00:00.00Z,oyunbitistarihi=2009-12-31T23:59:59.00Z)</a>
+            <br />
+            <a href="/odata/yapimcioyunyorumlar/oyuntarihinegoregetir(oyunbaslangictarihi=null,oyunbitistarihi=null)" target="_blank">/odata/yapimcioyunyorumlar/oyuntarihinegoregetir(oyunbaslangictarihi=null,oyunbitistarihi=null)</a>
+        </li>
+        <li>
+            ACTION'LAR
+            <br />
+            Öncelikle action adına göre ~/Proje/Configs/OdataConfig.cs Configure methodunda ekleme yapılmalıdır.
+            <br />
+            Action'lar POST methodu ile kullanılır.
+            <br />
+            1) Parametresiz Action'lar
+            <br />
+            <form action="/odata/yapimcioyunyorumlar/kayitsayisinigetir" method="post">
+                <button type="submit">Yapımcı Oyun Yorum Kayıt Sayısı</button>
+            </form>
+            <br />
+            <form action="/odata/yapimcioyunyorumlar/yapimcioyunadlarinigetir" method="post">
+                <button type="submit">Yapımcı Oyun Adları</button>
+            </form>
+            <br />
+            <form action="/odata/yapimcioyunyorumlar(1)/yapimcioyunadipuaninigetir" method="post">
+                <button type="submit">1 Yapımcı ID'li Yapımcı Oyun Adı Ve Puanı</button>
+            </form>
+            <br />
+            2) Parametreli Action'lar
+            <br />
+            <form action="/odata/yapimcioyunyorumlar/yorumcuadinagoregetir" method="post">
+                Yorumcu Adı: <input type="text" name="yorumcuadi" value="Oyungezer" />
+                <button type="submit">Yorumcu Adına Göre Yapımcı Oyun Yorumlar</button>
+            </form>
+            <br />
+            <form action="/odata/yapimcioyunyorumlar/yapimciadioyunpuaninagoregetir" method="post">
+                Yapımcı Adı: <input type="text" name="yapimciadi" value="Electronic Arts" />
+                &nbsp;
+                Oyun Başlangıç Puanı: <input type="text" name="oyunbaslangicpuani" value="70" />
+                &nbsp;
+                Oyun Bitiş Puanı: <input type="text" name="oyunbitispuani" value="90" />
+                &nbsp;
+                <button type="submit">Yapımcı Adı Ve Oyun Puanına Göre Yapımcı Oyun Yorumlar</button>
+            </form>
+            <br />
+
+            <form action="/odata/yapimcioyunyorumlar/yapimcioyunpuanortalmasinigetir" method="post">
+                Form:
+                <br />
+                Yapımcı ID: <input type="text" name="yapimciId" value="2" />
+                <button type="submit">Yapımcı ID'ye Göre Yapımcı Oyun Puan Ortalaması</button>
+            </form>
+            <div>
+                jQuery: Servisten dönen sonuç üzerinden .value ile veriye ulaşılır!
+                <br />
+                Yapımcı ID: <input type="text" id="yapimciidinput" value="2" />
+                <button id="yapimcioyunpuanortalmasibutton">Yapımcı ID'ye Göre Yapımcı Oyun Puan Ortalaması</button>
+                <br />
+                <label id="yapimcioyunpuanortalmasilabel"></label>
+            </div>
+            <script src="js/jquery/jquery.min.js"></script>
+            <script>
+                $(function () {
+                    $("#yapimcioyunpuanortalmasibutton").click(function () {
+                        $.post("/odata/yapimcioyunyorumlar/yapimcioyunpuanortalmasinigetir",
+                            { yapimciId: $("#yapimciidinput").val() },
+                            function (result) {
+                                $("#yapimcioyunpuanortalmasilabel").text(result.value);
+                            });
+                    });
+                });
+            </script>
+
+            <br />
+            <form action="/odata/yapimcioyunyorumlar/tumyapimcioyunyorumlarigetir" method="post">
+                Yapımcı ID: <input type="text" name="yapimciid" value="2" />
+                <br />
+                Yapımcı Adı: <input type="text" name="yapimciadi" value="Valve" />
+                <br />
+                Oyun Adı: <input type="text" name="oyunadi" value="Half-Life 2" />
+                <br />
+                Oyun Başlangıç Tarihi: <input type="text" name="oyunbaslangictarihi" value="2004-06-22T00:00:00.00Z" />
+                <br />
+                Oyun Bitiş Tarihi: <input type="text" name="oyunbitistarihi" value="2004-06-22T23:59:59.00Z" />
+                <br />
+                Oyun Başlangıç Puanı: <input type="text" name="oyunbaslangicpuani" value="96" />
+                <br />
+                Oyun Bitiş Puanı: <input type="text" name="oyunbitispuani" value="96" />
+                <br />
+                Yorumcu Adı: <input type="text" name="yorumcuadi" value="Level" />
+                <br />
+                <button type="submit">Filtreye Göre Tüm Yapımcı Oyun Yorumlar</button>
+            </form>
+        </li>
+    </ul>
+    <b>Hazırlayan</b>
+    <ul>
+        <li>
+            ONBOUND FUNCTION / ACTION
+            <br />
+            OData ile bir modele (entity set) bağlı kalınmadan da function veya action'lar oluşturulabilir.
+            <br />
+            <a href="/odata/hazirlayanigetir" target="_blank">/odata/hazirlayanigetir</a>
+        </li>
+    </ul>
+</body>
+</html>
