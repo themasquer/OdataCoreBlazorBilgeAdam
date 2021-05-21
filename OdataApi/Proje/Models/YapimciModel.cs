@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace OdataApi.Proje.Models
 {
@@ -9,5 +10,7 @@ namespace OdataApi.Proje.Models
         [Required]
         [StringLength(400)]
         public string Adi { get; set; }
+
+        public List<OyunModel> Oyunlar { get; set; }
     }
 }

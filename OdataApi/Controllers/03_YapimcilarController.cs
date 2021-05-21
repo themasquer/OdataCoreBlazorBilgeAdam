@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNet.OData;
 using Microsoft.AspNetCore.Mvc;
+using OdataApi.Proje.Models;
 using OdataApi.Proje.Services.Bases;
 using System.Linq;
 
@@ -61,5 +62,43 @@ namespace OdataApi.Controllers
             return Ok(list);
         }
         #endregion
+
+
+
+        //[HttpPost] // aksiyon adı aynı olduğu için yazılmasına gerek yoktur
+        //public IActionResult Post([FromBody]YapimciModel model) // [FromBody] attribute'unun yazılmasına gerek yoktur
+        public IActionResult Post(YapimciModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                _yapimciService.Add(model);
+                return Created(model);
+            }
+            return BadRequest(ModelState);
+        }
+
+        //[HttpPut] // aksiyon adı aynı olduğu için yazılmasına gerek yoktur
+        //public IActionResult Put([FromODataUri]int key, [FromBody]YapimciModel model) // [FromODataUri] ve [FromBody] attribute'larının yazılmasına gerek yoktur
+        public IActionResult Put(int key, YapimciModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                model.Id = key;
+                _yapimciService.Update(model);
+
+                Request.Headers.Add("Prefer", "return=representation"); // aşağıdaki Updated() methodu ile modeli dönebilmek için eklenmesi gerekmektedir
+
+                return Updated(model);
+            }
+            return BadRequest(ModelState);
+        }
+
+        //[HttpDelete] // aksiyon adı aynı olduğu için yazılmasına gerek yoktur
+        //public IActionResult Delete([FromODataUri]int key) // [FromODataUri] attribute'unun yazılmasına gerek yoktur
+        public IActionResult Delete(int key)
+        {
+            _yapimciService.Delete(key);
+            return NoContent();
+        }
     }
 }

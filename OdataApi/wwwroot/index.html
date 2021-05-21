@@ -11,16 +11,27 @@
 </head>
 <body>
     <h3>ODataApi Test Sayfası</h3>
+    <b>CREATE, UPDATE, DELETE İŞLEMLERİ</b>
+    <br />
+    <a href="/api/Migrations" target="_blank">İlk Migration Verilerini Oluştur</a>
+    <br />
+    <a href="/oyunlar.html" target="_blank">Oyunlar jQuery Create, Update Delete İşlemleri</a>
+    <br />
+    <a href="/yorumlar.html" target="_blank">Yorumlar jQuery Create, Update Delete İşlemleri</a>
+    <br />
+    <a href="/yapimcilar.html" target="_blank">Yapımcılar jQuery Create, Update Delete İşlemleri</a>
+    <hr />
+    <b>READ İŞLEMLERİ</b>
+    <br />
     OData sorguları üzerinden büyük küçük harf duyarsız sorgulama yapılabilir.
-    <hr />
-    Migrations: <a href="/api/Migrations">İlk Verileri Oluştur</a>
-    <hr />
+    <br />
+    <br />
+    <b>META DATA</b>
     <ul>
         <li>
             <a href="/odata/$metadata" target="_blank">/odata/$metadata</a>
         </li>
     </ul>
-    <hr />
     <b>Oyunlar</b>
     <ul>
         <li>
@@ -167,7 +178,7 @@
             <br />
             trim : Bir string ifadenin başındaki ve sonundaki boşlukları temizleyerek filtreleme yapmak için kullanılır.
             <br />
-            <a href="/odata/oyunlar?$filter=trim(adi) eq 'red dead redemption 2'" target="_blank">/odata/oyunlar?$filter=trim(adi) eq 'red dead redemption 2'</a>
+            <a href="/odata/oyunlar?$filter=trim(adi) eq trim(' red dead redemption 2 ')" target="_blank">/odata/oyunlar?$filter=trim(adi) eq trim(' red dead redemption 2 ')</a>
             <br />
             Diğer String Fonksiyonları: contains, concat, substring, tolower, toupper
             <br />
@@ -192,8 +203,8 @@
         <li>
             QUERY OPTIONS
             <br />
-            <a href="/odata/yorumlar?$orderby=tarihi asc,yorumcuadi asc&$filter=tarihi ge 2010-01-01T00:00:00.00Z" target="_blank">
-                /odata/yorumlar?$orderby=tarihi asc,yorumcuadi asc&$filter=tarihi ge 2010-01-01T00:00:00.00Z
+            <a href="/odata/yorumlar?$orderby=yorumcuadi asc,tarihi asc&$filter=tarihi ge 2010-01-01T00:00:00.00Z" target="_blank">
+                /odata/yorumlar?$orderby=yorumcuadi asc,tarihi asc&$filter=tarihi ge 2010-01-01T00:00:00.00Z
             </a>
             <br />
             Kullanabilmek için ilgili controller action'ına ODataQueryOptions tipinde bir parametre gönderilmelidir. Bu durumda EnableQuery attribute'unu kullanmaya gerek yoktur.
@@ -201,8 +212,9 @@
         <li>
             AKSİYONLARDA PARAMETRE KULLANIMI VE CUSTOM ROUTE
             <br />
-            <a href="/odata/yorumlar(1)" target="_blank">/odata/yorumlar(1)</a>
+            <a href="/odata/yorumlar(3)" target="_blank">/odata/yorumlar(3)</a>
             <br />
+            <a href="/odata/yorumlar(3)?$select=yorumcuadi,aciklamasi,tarihi,oyunadi" target="_blank">/odata/yorumlar(3)?$select=yorumcuadi,aciklamasi,tarihi,oyunadi</a>
             <br />
             İstenilen OData sorgu yapıları ($select, $expand, $filter, $orderby, vb.) kullanılabilir.
         </li>
@@ -222,6 +234,10 @@
             ANAHTAR (ID) ÜZERİNDEN KAYIT ÇEKME
             <br />
             <a href="/odata/yapimcilar(2)" target="_blank">/odata/yapimcilar(2)</a>
+            <br />
+            <a href="/odata/yapimcilar(2)?$expand=oyunlar&$select=adi,oyunlar" target="_blank">/odata/yapimcilar(2)?$expand=oyunlar&$select=adi,oyunlar</a>
+            <br />
+            İstenilen OData sorgu yapıları ($select, $expand, $filter, $orderby, vb.) kullanılabilir.
         </li>
         <li>
             FUNCTION'LAR
@@ -319,7 +335,7 @@
             </script>
 
             <br />
-            <form action="/odata/yapimcioyunyorumlar/tumyapimcioyunyorumlarigetir" method="post">
+            <form action="/odata/yapimcioyunyorumlar/tumyapimcioyunyorumlarinigetir" method="post">
                 Yapımcı ID: <input type="text" name="yapimciid" value="2" />
                 <br />
                 Yapımcı Adı: <input type="text" name="yapimciadi" value="Valve" />

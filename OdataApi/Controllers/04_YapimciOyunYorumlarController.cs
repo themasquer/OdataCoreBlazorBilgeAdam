@@ -96,7 +96,7 @@ namespace OdataApi.Controllers
         }
 
         [HttpPost]
-        public IActionResult TumYapimciOyunYorumlariGetir(YapimciOyunYorumFilterModel filter)
+        public IActionResult TumYapimciOyunYorumlariniGetir(YapimciOyunYorumFilterModel filter)
         {
             var list = _yapimciOyunYorumService.GetYapimciOyunYorumlar(filter);
             return Ok(list);

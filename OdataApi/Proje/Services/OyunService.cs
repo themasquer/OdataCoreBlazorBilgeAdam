@@ -31,5 +31,37 @@ namespace OdataApi.Proje.Services
                 }
             });
         }
+
+        public void Add(OyunModel model)
+        {
+            var entity = new Oyun()
+            {
+                Adi = model.Adi.Trim(),
+                Puani = model.Puani,
+                Tarihi = model.Tarihi,
+                YapimciId = model.YapimciId
+            };
+            _db.Set<Oyun>().Add(entity);
+            _db.SaveChanges();
+            model.Id = entity.Id;
+        }
+
+        public void Update(OyunModel model)
+        {
+            var entity = _db.Set<Oyun>().Find(model.Id);
+            entity.Adi = model.Adi.Trim();
+            entity.Puani = model.Puani;
+            entity.Tarihi = model.Tarihi;
+            entity.YapimciId = model.YapimciId;
+            _db.Set<Oyun>().Update(entity);
+            _db.SaveChanges();
+        }
+
+        public void Delete(int id)
+        {
+            var entity = _db.Set<Oyun>().Find(id);
+            _db.Set<Oyun>().Remove(entity);
+            _db.SaveChanges();
+        }
     }
 }

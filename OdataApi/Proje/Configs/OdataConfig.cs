@@ -61,7 +61,7 @@ namespace OdataApi.Proje.Configs
             oyunTarihineGoreGetirAction.Parameter<double?>("oyunBaslangicPuani");
             oyunTarihineGoreGetirAction.Parameter<double?>("oyunBitisPuani");
 
-            var tumYapimciOyunYorumlariGetirAction = builder.EntityType<YapimciOyunYorumModel>().Collection.Action("TumYapimciOyunYorumlariGetir").Returns<List<YapimciOyunYorumModel>>(); // *1
+            var tumYapimciOyunYorumlariGetirAction = builder.EntityType<YapimciOyunYorumModel>().Collection.Action("TumYapimciOyunYorumlariniGetir").Returns<List<YapimciOyunYorumModel>>(); // *1
             tumYapimciOyunYorumlariGetirAction.Parameter<YapimciOyunYorumFilterModel>("filter");
 
             builder.Function("HazirlayaniGetir").Returns<string>();

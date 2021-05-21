@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNet.OData;
 using Microsoft.AspNetCore.Mvc;
+using OdataApi.Proje.Entities;
+using OdataApi.Proje.Models;
 using OdataApi.Proje.Services.Bases;
 
 namespace OdataApi.Controllers
@@ -56,11 +58,48 @@ namespace OdataApi.Controllers
             _oyunService = oyunService;
         }
 
+        //[HttpGet]
         [EnableQuery]
         public IActionResult Get()
         {
             var query = _oyunService.Query();
             return Ok(query);
+        }
+
+        //[HttpPost] // aksiyon adı aynı olduğu için yazılmasına gerek yoktur
+        //public IActionResult Post([FromBody]OyunModel model) // [FromBody] attribute'unun yazılmasına gerek yoktur
+        public IActionResult Post(OyunModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                _oyunService.Add(model);
+                return Created(model);
+            }
+            return BadRequest(ModelState);
+        }
+
+        //[HttpPut] // aksiyon adı aynı olduğu için yazılmasına gerek yoktur
+        //public IActionResult Put([FromODataUri]int key, [FromBody]OyunModel model) // [FromODataUri] ve [FromBody] attribute'larının yazılmasına gerek yoktur
+        public IActionResult Put(int key, OyunModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                model.Id = key;
+                _oyunService.Update(model);
+
+                Request.Headers.Add("Prefer", "return=representation"); // aşağıdaki Updated() methodu ile modeli dönebilmek için eklenmesi gerekmektedir
+
+                return Updated(model);
+            }
+            return BadRequest(ModelState);
+        }
+
+        //[HttpDelete] // aksiyon adı aynı olduğu için yazılmasına gerek yoktur
+        //public IActionResult Delete([FromODataUri]int key) // [FromODataUri] attribute'unun yazılmasına gerek yoktur
+        public IActionResult Delete(int key)
+        {
+            _oyunService.Delete(key);
+            return NoContent();
         }
     }
 }

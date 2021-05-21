@@ -2,6 +2,7 @@
 using OdataApi.Proje.Models;
 using OdataApi.Proje.Services.Bases;
 using System.Linq;
+using OdataApi.Proje.Entities;
 
 namespace OdataApi.Proje.Services
 {
@@ -29,6 +30,38 @@ namespace OdataApi.Proje.Services
                 OyunYapimciId = y.Oyun.YapimciId,
                 OyunYapimciAdi = y.Oyun.Yapimci.Adi
             });
+        }
+
+        public void Add(YorumModel model)
+        {
+            var entity = new Yorum()
+            {
+                YorumcuAdi = model.YorumcuAdi.Trim(),
+                Aciklamasi = model.Aciklamasi.Trim(),
+                Tarihi = model.Tarihi,
+                OyunId = model.OyunId
+            };
+            _db.Set<Yorum>().Add(entity);
+            _db.SaveChanges();
+            model.Id = entity.Id;
+        }
+
+        public void Update(YorumModel model)
+        {
+            var entity = _db.Set<Yorum>().Find(model.Id);
+            entity.YorumcuAdi = model.YorumcuAdi.Trim();
+            entity.Aciklamasi = model.Aciklamasi.Trim();
+            entity.Tarihi = model.Tarihi;
+            entity.OyunId = model.OyunId;
+            _db.Set<Yorum>().Update(entity);
+            _db.SaveChanges();
+        }
+
+        public void Delete(int id)
+        {
+            var entity = _db.Set<Yorum>().Find(id);
+            _db.Set<Yorum>().Remove(entity);
+            _db.SaveChanges();
         }
     }
 }

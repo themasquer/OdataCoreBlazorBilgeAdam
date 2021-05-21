@@ -1,0 +1,106 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>ODataApi Test Sayfası</title>
+</head>
+<body>
+    <h3>ODataApi Test Sayfası</h3>
+    <b>YORUMLAR</b> (Hata alınmaması için aşağıdaki test işlemleri sıralı gerçekleştirilmelidir. Tüm veriler <u>İlk Migration Verilerini Oluştur</u> link'i ile sıfırlanabilir.)
+    <hr />
+    <a href="/api/Migrations" target="_blank">İlk Migration Verilerini Oluştur</a>
+    <br />
+    <a href="/odata/yorumlar" target="_blank">Yorumlar</a>
+    <hr />
+    <b><label id="message"></label></b>
+    <hr />
+    <b>CREATE</b>
+    <div>
+        Yorumcu Adı: <input type="text" id="cyorumcuadi" value="Çağıl Alsaç" />
+        <br />
+        Açıklaması: <input type="text" id="caciklamasi" value="Başarılı." />
+        <br />
+        Tarihi: <input type="text" id="ctarihi" value="2021-05-20T12:34:56.00Z" />
+        <br />
+        Oyun ID: <input type="text" id="coyunid" value="1" />
+        <br />
+        <button id="csubmit">Post</button>
+    </div>
+    <hr />
+    <b>UPDATE</b>
+    <div>
+        ID: <input type="text" id="uid" value="10" />
+        <br />
+        Yorumcu Adı: <input type="text" id="uyorumcuadi" value="Çağıl Alsaç" />
+        <br />
+        Açıklaması: <input type="text" id="uaciklamasi" value="Süper." />
+        <br />
+        Tarihi: <input type="text" id="utarihi" value="2021-05-21T10:20:30.00Z" />
+        <br />
+        Oyun ID: <input type="text" id="uoyunid" value="1" />
+        <br />
+        <button id="usubmit">Put</button>
+    </div>
+    <hr />
+    <b>DELETE</b>
+    <div>
+        ID: <input type="text" id="did" value="10" />
+        <br />
+        <button id="dsubmit">Delete</button>
+    </div>
+
+    <script src="js/jquery/jquery.min.js"></script>
+    <script>
+        $(function () {
+            $("#csubmit").click(function () {
+                $.ajax({
+                    url: "/odata/yorumlar",
+                    type: "post",
+                    data: { yorumcuadi: $("#cyorumcuadi").val(), aciklamasi: $("#caciklamasi").val(), tarihi: $("#ctarihi").val(), oyunid: $("#coyunid").val() },
+                    dataType: "json",
+                    success: function (result) {
+
+                        // End point'te Created methodu gönderdiğimiz tarihe zaman dilimini ekleyerek yanlış tarih döndüğü için tarih verisini dönüştürüyoruz!
+                        result.Tarihi = new Date(result.Tarihi).toISOString(); 
+
+                        $("#message").html("İşlem başarılı:<br />" + JSON.stringify(result));
+                    },
+                    error: function (result) {
+                        $("#message").html("İşlem sırasında hata meydana geldi:<br />" + JSON.stringify(result.responseJSON.error));
+                    }
+                });
+            });
+            $("#usubmit").click(function () {
+                $.ajax({
+                    url: "/odata/yorumlar(" + $("#uid").val() + ")",
+                    type: "put",
+                    data: { yorumcuadi: $("#uyorumcuadi").val(), aciklamasi: $("#uaciklamasi").val(), tarihi: $("#utarihi").val(), oyunid: $("#uoyunid").val() },
+                    dataType: "json",
+                    success: function (result) {
+
+                        // End point'te Created methodu gönderdiğimiz tarihe zaman dilimini ekleyerek yanlış tarih döndüğü için tarih verisini dönüştürüyoruz!
+                        result.Tarihi = new Date(result.Tarihi).toISOString(); 
+
+                        $("#message").html("İşlem başarılı:<br />" + JSON.stringify(result));
+                    },
+                    error: function (result) {
+                        $("#message").html("İşlem sırasında hata meydana geldi:<br />" + JSON.stringify(result.responseJSON.error));
+                    }
+                });
+            });
+            $("#dsubmit").click(function () {
+                $.ajax({
+                    url: "/odata/yorumlar(" + $("#did").val() + ")",
+                    type: "delete",
+                    success: function () {
+                        $("#message").html("İşlem başarılı.");
+                    },
+                    error: function () {
+                        $("#message").html("İşlem sırasında hata meydana geldi!");
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

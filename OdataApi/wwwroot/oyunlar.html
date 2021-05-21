@@ -1,0 +1,106 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>ODataApi Test Sayfası</title>
+</head>
+<body>
+    <h3>ODataApi Test Sayfası</h3>
+    <b>OYUNLAR</b> (Hata alınmaması için aşağıdaki test işlemleri sıralı gerçekleştirilmelidir. Tüm veriler <u>İlk Migration Verilerini Oluştur</u> link'i ile sıfırlanabilir.)
+    <hr />
+    <a href="/api/Migrations" target="_blank">İlk Migration Verilerini Oluştur</a>
+    <br />
+    <a href="/odata/oyunlar" target="_blank">Oyunlar</a>
+    <hr />
+    <b><label id="message"></label></b>
+    <hr />
+    <b>CREATE</b>
+    <div>
+        Adı: <input type="text" id="cadi" value="FIFA 19" />
+        <br />
+        Puanı: <input type="text" id="cpuani" value="81" />
+        <br />
+        Tarihi: <input type="text" id="ctarihi" value="2018-09-20T00:00:00.00Z" />
+        <br />
+        Yapımcı ID: <input type="text" id="cyapimciid" value="3" />
+        <br />
+        <button id="csubmit">Post</button>
+    </div>
+    <hr />
+    <b>UPDATE</b>
+    <div>
+        ID: <input type="text" id="uid" value="7" />
+        <br />
+        Adı: <input type="text" id="uadi" value="FIFA 21" />
+        <br />
+        Puanı: <input type="text" id="upuani" value="74" />
+        <br />
+        Tarihi: <input type="text" id="utarihi" value="2020-10-09T00:00:00.00Z" />
+        <br />
+        Yapımcı ID: <input type="text" id="uyapimciid" value="3" />
+        <br />
+        <button id="usubmit">Put</button>
+    </div>
+    <hr />
+    <b>DELETE</b>
+    <div>
+        ID: <input type="text" id="did" value="7" />
+        <br />
+        <button id="dsubmit">Delete</button>
+    </div>
+
+    <script src="js/jquery/jquery.min.js"></script>
+    <script>
+        $(function () {
+            $("#csubmit").click(function () {
+                $.ajax({
+                    url: "/odata/oyunlar",
+                    type: "post",
+                    data: { adi: $("#cadi").val(), puani: $("#cpuani").val(), tarihi: $("#ctarihi").val(), yapimciid: $("#cyapimciid").val() },
+                    dataType: "json",
+                    success: function (result) {
+
+                        // End point'te Created methodu gönderdiğimiz tarihe zaman dilimini ekleyerek yanlış tarih döndüğü için tarih verisini dönüştürüyoruz!
+                        result.Tarihi = new Date(result.Tarihi).toISOString(); 
+
+                        $("#message").html("İşlem başarılı:<br />" + JSON.stringify(result));
+                    },
+                    error: function (result) {
+                        $("#message").html("İşlem sırasında hata meydana geldi:<br />" + JSON.stringify(result.responseJSON.error));
+                    }
+                });
+            });
+            $("#usubmit").click(function () {
+                $.ajax({
+                    url: "/odata/oyunlar(" + $("#uid").val() + ")",
+                    type: "put",
+                    data: { adi: $("#uadi").val(), puani: $("#upuani").val(), tarihi: $("#utarihi").val(), yapimciid: $("#uyapimciid").val() },
+                    dataType: "json",
+                    success: function (result) {
+
+                        // End point'te Created methodu gönderdiğimiz tarihe zaman dilimini ekleyerek yanlış tarih döndüğü için tarih verisini dönüştürüyoruz!
+                        result.Tarihi = new Date(result.Tarihi).toISOString(); 
+
+                        $("#message").html("İşlem başarılı:<br />" + JSON.stringify(result));
+                    },
+                    error: function (result) {
+                        $("#message").html("İşlem sırasında hata meydana geldi:<br />" + JSON.stringify(result.responseJSON.error));
+                    }
+                });
+            });
+            $("#dsubmit").click(function () {
+                $.ajax({
+                    url: "/odata/oyunlar(" + $("#did").val() + ")",
+                    type: "delete",
+                    success: function () {
+                        $("#message").html("İşlem başarılı.");
+                    },
+                    error: function () {
+                        $("#message").html("İşlem sırasında hata meydana geldi!");
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
