@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using OdataApi.Proje.Configs;
-using OdataApi.Proje.Contexts;
-using OdataApi.Proje.Services;
-using OdataApi.Proje.Services.Bases;
+using OdataApi.Configs;
+using OdataApi.Contexts;
+using OdataApi.Services;
+using OdataApi.Services.Bases;
 
 namespace OdataApi
 {

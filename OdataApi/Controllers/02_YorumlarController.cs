@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Query;
-using OdataApi.Proje.Models;
-using OdataApi.Proje.Services.Bases;
-using System.Linq;
 using Microsoft.AspNet.OData.Routing;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
+using OdataApi.Models;
+using OdataApi.Services.Bases;
 
 namespace OdataApi.Controllers
 {

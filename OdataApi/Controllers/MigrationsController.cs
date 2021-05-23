@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using OdataApi.Proje.Contexts;
-using OdataApi.Proje.Entities;
+using Microsoft.EntityFrameworkCore;
+using OdataApi.Contexts;
+using OdataApi.Entities;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
 
 namespace OdataApi.Controllers
 {
@@ -153,27 +153,34 @@ namespace OdataApi.Controllers
                 },
             };
 
-            _db.Database.ExecuteSqlRaw("dbcc CHECKIDENT('Oyunlar', RESEED, 0)");
-            _db.Database.ExecuteSqlRaw("dbcc CHECKIDENT('Yapimcilar', RESEED, 0)");
-            _db.Database.ExecuteSqlRaw("dbcc CHECKIDENT('Yorumlar', RESEED, 0)");
+            int idSeedValue = 0;
+            int oyunlarCount = _db.Oyunlar.Count();
+            if (oyunlarCount == 0)
+                idSeedValue = 1;
+
+            _db.Database.ExecuteSqlRaw("dbcc CHECKIDENT('Oyunlar', RESEED, " + idSeedValue + ")");
+            _db.Database.ExecuteSqlRaw("dbcc CHECKIDENT('Yapimcilar', RESEED, " + idSeedValue + ")");
+            _db.Database.ExecuteSqlRaw("dbcc CHECKIDENT('Yorumlar', RESEED, " + idSeedValue + ")");
 
             List<Yapimci> dbYapimcilar = _db.Yapimcilar.ToList();
             _db.Yapimcilar.RemoveRange(dbYapimcilar);
+            _db.SaveChanges();
 
             List<Oyun> dbOyunlar = _db.Oyunlar.ToList();
             _db.Oyunlar.RemoveRange(dbOyunlar);
+            _db.SaveChanges();
 
             List<Yorum> dbYorumlar = _db.Yorumlar.ToList();
             _db.Yorumlar.RemoveRange(dbYorumlar);
-
             _db.SaveChanges();
 
             _db.Yapimcilar.AddRange(yapimcilar);
+            _db.SaveChanges();
             _db.Oyunlar.AddRange(oyunlar);
+            _db.SaveChanges();
             _db.Yorumlar.AddRange(yorumlar);
             _db.SaveChanges();
-
-            return Ok("İlk veriler başarıyla oluşturuldu.");
+            return Ok("İlk veriler başarıyla olşuturuldu!");
         }
     }
 }

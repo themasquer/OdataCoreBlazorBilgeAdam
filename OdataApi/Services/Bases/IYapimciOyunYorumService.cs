@@ -1,8 +1,8 @@
-﻿using OdataApi.Proje.Models;
-using OdataApi.Proje.Models.Filtering;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using OdataApi.Models;
+using OdataApi.Models.Filtering;
 
-namespace OdataApi.Proje.Services.Bases
+namespace OdataApi.Services.Bases
 {
     public interface IYapimciOyunYorumService
     {

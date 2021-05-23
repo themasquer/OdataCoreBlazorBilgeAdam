@@ -1,7 +1,7 @@
 ﻿using System.Linq;
-using OdataApi.Proje.Models;
+using OdataApi.Models;
 
-namespace OdataApi.Proje.Services.Bases
+namespace OdataApi.Services.Bases
 {
     public interface IYorumService
     {

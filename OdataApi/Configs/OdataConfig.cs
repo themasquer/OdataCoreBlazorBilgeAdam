@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.AspNet.OData.Builder;
+﻿using Microsoft.AspNet.OData.Builder;
 using Microsoft.AspNet.OData.Extensions;
 using Microsoft.AspNetCore.Builder;
-using OdataApi.Proje.Models;
-using OdataApi.Proje.Models.Filtering;
+using System;
+using System.Collections.Generic;
+using OdataApi.Models;
+using OdataApi.Models.Filtering;
 
-namespace OdataApi.Proje.Configs
+namespace OdataApi.Configs
 {
     public class OdataConfig
     {

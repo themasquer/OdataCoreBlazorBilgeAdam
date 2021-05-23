@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using OdataApi.Proje.Contexts;
+using OdataApi.Contexts;
 
-namespace OdataApi.Proje.Migrations
+namespace OdataApi.Migrations
 {
     [DbContext(typeof(DefaultContext))]
     partial class DefaultContextModelSnapshot : ModelSnapshot
@@ -16,10 +16,10 @@ namespace OdataApi.Proje.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.4")
+                .HasAnnotation("ProductVersion", "5.0.6")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("OdataApi.Proje.Entities.Oyun", b =>
+            modelBuilder.Entity("OdataApi.Entities.Oyun", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -47,7 +47,7 @@ namespace OdataApi.Proje.Migrations
                     b.ToTable("Oyunlar");
                 });
 
-            modelBuilder.Entity("OdataApi.Proje.Entities.Yapimci", b =>
+            modelBuilder.Entity("OdataApi.Entities.Yapimci", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -64,7 +64,7 @@ namespace OdataApi.Proje.Migrations
                     b.ToTable("Yapimcilar");
                 });
 
-            modelBuilder.Entity("OdataApi.Proje.Entities.Yorum", b =>
+            modelBuilder.Entity("OdataApi.Entities.Yorum", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -94,9 +94,9 @@ namespace OdataApi.Proje.Migrations
                     b.ToTable("Yorumlar");
                 });
 
-            modelBuilder.Entity("OdataApi.Proje.Entities.Oyun", b =>
+            modelBuilder.Entity("OdataApi.Entities.Oyun", b =>
                 {
-                    b.HasOne("OdataApi.Proje.Entities.Yapimci", "Yapimci")
+                    b.HasOne("OdataApi.Entities.Yapimci", "Yapimci")
                         .WithMany("Oyunlar")
                         .HasForeignKey("YapimciId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -105,9 +105,9 @@ namespace OdataApi.Proje.Migrations
                     b.Navigation("Yapimci");
                 });
 
-            modelBuilder.Entity("OdataApi.Proje.Entities.Yorum", b =>
+            modelBuilder.Entity("OdataApi.Entities.Yorum", b =>
                 {
-                    b.HasOne("OdataApi.Proje.Entities.Oyun", "Oyun")
+                    b.HasOne("OdataApi.Entities.Oyun", "Oyun")
                         .WithMany("Yorumlar")
                         .HasForeignKey("OyunId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -116,12 +116,12 @@ namespace OdataApi.Proje.Migrations
                     b.Navigation("Oyun");
                 });
 
-            modelBuilder.Entity("OdataApi.Proje.Entities.Oyun", b =>
+            modelBuilder.Entity("OdataApi.Entities.Oyun", b =>
                 {
                     b.Navigation("Yorumlar");
                 });
 
-            modelBuilder.Entity("OdataApi.Proje.Entities.Yapimci", b =>
+            modelBuilder.Entity("OdataApi.Entities.Yapimci", b =>
                 {
                     b.Navigation("Oyunlar");
                 });

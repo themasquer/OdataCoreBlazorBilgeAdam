@@ -1,10 +1,10 @@
-﻿using OdataApi.Proje.Contexts;
-using OdataApi.Proje.Entities;
-using OdataApi.Proje.Models;
-using OdataApi.Proje.Services.Bases;
-using System.Linq;
+﻿using System.Linq;
+using OdataApi.Contexts;
+using OdataApi.Entities;
+using OdataApi.Models;
+using OdataApi.Services.Bases;
 
-namespace OdataApi.Proje.Services
+namespace OdataApi.Services
 {
     public class YapimciService : IYapimciService
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace OdataApi.Proje.Migrations
+namespace OdataApi.Migrations
 {
     public partial class v1 : Migration
     {

@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace OdataApi.Proje.Entities
+namespace OdataApi.Models
 {
-    public class Oyun
+    public class OyunModel
     {
         public int Id { get; set; }
 
@@ -13,12 +12,9 @@ namespace OdataApi.Proje.Entities
         public string Adi { get; set; }
 
         public DateTime Tarihi { get; set; }
-
         public double Puani { get; set; }
 
         public int YapimciId { get; set; }
-        public Yapimci Yapimci { get; set; }
-
-        public List<Yorum> Yorumlar { get; set; }
+        public YapimciModel Yapimci { get; set; }
     }
 }

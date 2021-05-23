@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNet.OData;
 using Microsoft.AspNetCore.Mvc;
-using OdataApi.Proje.Models;
-using OdataApi.Proje.Services.Bases;
 using System.Linq;
+using OdataApi.Models;
+using OdataApi.Services.Bases;
 
 namespace OdataApi.Controllers
 {

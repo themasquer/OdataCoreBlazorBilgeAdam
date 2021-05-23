@@ -1,13 +1,13 @@
-﻿using OdataApi.Proje.Contexts;
-using OdataApi.Proje.Entities;
-using OdataApi.Proje.Models;
-using OdataApi.Proje.Models.Filtering;
-using OdataApi.Proje.Services.Bases;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
+using OdataApi.Contexts;
+using OdataApi.Entities;
+using OdataApi.Models;
+using OdataApi.Models.Filtering;
+using OdataApi.Services.Bases;
 
-namespace OdataApi.Proje.Services
+namespace OdataApi.Services
 {
     public class YapimciOyunYorumService : IYapimciOyunYorumService
     {

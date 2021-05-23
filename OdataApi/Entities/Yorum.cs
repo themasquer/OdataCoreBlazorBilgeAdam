@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace OdataApi.Proje.Entities
+namespace OdataApi.Entities
 {
     public class Yorum
     {

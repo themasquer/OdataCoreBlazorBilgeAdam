@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace OdataApi.Proje.Models.Filtering
+namespace OdataApi.Models.Filtering
 {
     public class YapimciOyunYorumFilterModel
     {

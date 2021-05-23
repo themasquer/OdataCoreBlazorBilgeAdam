@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace OdataApi.Proje.Models
+namespace OdataApi.Models
 {
     public class YapimciOyunYorumModel
     {

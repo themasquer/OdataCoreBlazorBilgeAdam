@@ -1,7 +1,7 @@
-﻿using OdataApi.Proje.Models;
-using System.Linq;
+﻿using System.Linq;
+using OdataApi.Models;
 
-namespace OdataApi.Proje.Services.Bases
+namespace OdataApi.Services.Bases
 {
     public interface IOyunService
     {

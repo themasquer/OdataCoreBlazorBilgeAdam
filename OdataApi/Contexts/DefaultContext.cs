@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OdataApi.Proje.Entities;
+using OdataApi.Entities;
 
-namespace OdataApi.Proje.Contexts
+namespace OdataApi.Contexts
 {
     public class DefaultContext : DbContext
     {

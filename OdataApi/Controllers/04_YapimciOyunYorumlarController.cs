@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNet.OData;
 using Microsoft.AspNetCore.Mvc;
-using OdataApi.Proje.Models.Filtering;
-using OdataApi.Proje.Services.Bases;
 using System;
 using System.Linq;
+using OdataApi.Models.Filtering;
+using OdataApi.Services.Bases;
 
 namespace OdataApi.Controllers
 {
