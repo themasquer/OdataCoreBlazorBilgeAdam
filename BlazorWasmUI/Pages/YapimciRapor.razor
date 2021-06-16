@@ -1,0 +1,208 @@
+﻿@page "/yapimcirapor"
+@using BlazorWasmUI.Extensions
+
+@inject IYapimciService YapimciService
+
+@inject IJSRuntime JSRuntime
+
+@inject IModalService ModalService
+
+<h3>Yapımcı Raporu</h3>
+<hr />
+
+@if (yapimciRaporApiModel == null)
+{
+    <p>@AppConfig.Yukleniyor</p>
+}
+else
+{
+    <EditForm Model="@yapimciRaporApiModel.Filtre" OnValidSubmit="@SorgulaAsync" autocomplete="off">
+        <a href="" @onclick:preventDefault @onclick="ToggleFiltre">@((MarkupString)FiltreText)</a> @* Markupstring HTML string verilerini HTML formatında göstermek için kullanılır *@
+        <hr />
+        <div class="@FiltreCssClass">
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <DisplayName For="@(() => yapimciRaporApiModel.Filtre.YapimciId)" />
+                        <InputSelect @bind-Value="@yapimciRaporApiModel.Filtre.YapimciId" class="form-control">
+                            <option value="">-- Tüm Yapımcılar --</option>
+                            @foreach (var yapimci in yapimciRaporApiModel.Yapimcilar)
+                                {
+                                <option value="@yapimci.Id">@yapimci.Adi</option>
+                                }
+                        </InputSelect>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <DisplayName For="@(() => yapimciRaporApiModel.Filtre.OyunAdi)" />
+                        <InputText @bind-Value="@yapimciRaporApiModel.Filtre.OyunAdi" class="form-control" placeholder="Oyun adı girin..." />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <DisplayName For="@(() => yapimciRaporApiModel.Filtre.OyunBaslangicTarihi)" />
+                        <div class="input-group">
+                            <input onchange="setBlazorDate('BlazorWasmUI', 'SetBlazorStartDate', this);" class="form-control tarih" placeholder="Başlangıç tarihi girin..." />
+                            <span class="input-group-text">-</span>
+                            <input onchange="setBlazorDate('BlazorWasmUI', 'SetBlazorEndDate', this);" class="form-control tarih" placeholder="Bitiş tarihi girin..." />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <DisplayName For="@(() => yapimciRaporApiModel.Filtre.OyunBaslangicPuani)" />
+                        <div class="input-group">
+                            <InputText @bind-Value="@yapimciRaporApiModel.Filtre.OyunBaslangicPuani" type="number" class="form-control" placeholder="Başlangıç puanı girin..." />
+                            <span class="input-group-text">-</span>
+                            <InputText @bind-Value="@yapimciRaporApiModel.Filtre.OyunBitisPuani" type="number" class="form-control" placeholder="Bitiş puanı girin..." />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <DisplayName For="@(() => yapimciRaporApiModel.Filtre.YorumcuAdi)" />
+                        <InputText @bind-Value="@yapimciRaporApiModel.Filtre.YorumcuAdi" class="form-control" placeholder="Yorumcu adı girin..." />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary"><span class="oi oi-magnifying-glass"></span> Sorgula</button>
+                        &nbsp;
+                        <button class="btn btn-info" @onclick:preventDefault @onclick="@TemizleAsync"><span class="oi oi-reload"></span> Temizle</button>
+                        &nbsp;
+                        <button class="btn btn-outline-primary" @onclick:preventDefault @onclick="@ExcelRaporuAlAsync"><span class="oi oi-cloud-download"></span> Filtrelere Göre Excel Raporu Al</button>
+                    </div>
+                </div>
+            </div>
+            <hr />
+        </div>
+        @if (yapimciRaporApiModel.Yapimcilar.Count > 0)
+        {
+            <div class="row">
+                <div class="col-12">
+                    <table id="datatable" class="display" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th style="width: 30%;">
+                                    <DisplayName For="@(() => yapimciRaporApiModel.YapimciRaporList.FirstOrDefault().YapimciAdi)" />
+                                </th>
+                                <th style="width: 30%;">
+                                    <DisplayName For="@(() => yapimciRaporApiModel.YapimciRaporList.FirstOrDefault().OyunAdi)" />
+                                </th>
+                                <th style="width: 10%;">
+                                    <DisplayName For="@(() => yapimciRaporApiModel.YapimciRaporList.FirstOrDefault().OyunPuaniText)" />
+                                </th>
+                                <th style="width: 10%;">
+                                    <DisplayName For="@(() => yapimciRaporApiModel.YapimciRaporList.FirstOrDefault().OyunTarihiText)" />
+                                </th>
+                                <th style="width: 20%;">
+                                    <DisplayName For="@(() => yapimciRaporApiModel.YapimciRaporList.FirstOrDefault().YorumcuAdi)" />
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in yapimciRaporApiModel.YapimciRaporList)
+                            {
+                                <tr>
+                                    <td>
+                                        @item.YapimciAdi
+                                    </td>
+                                    <td>
+                                        @item.OyunAdi
+                                    </td>
+                                    <td>
+                                        @item.OyunPuaniText
+                                    </td>
+                                    <td>
+                                        @item.OyunTarihiText
+                                    </td>
+                                    <td>
+
+                                        @*@item.YorumcuAdi*@
+                                        <a style="cursor: zoom-in;" @onclick:preventDefault @onclick="@(() => YorumDetayiniGetir(item.YorumcuAdi, item.YorumAciklamasi, item.YorumTarihiText))">@item.YorumcuAdi <span class="oi oi-zoom-in"></span></a>
+
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+        else
+        {
+            <p class="text-success">@AppConfig.KayitBulunamadi</p>
+        }
+    </EditForm>
+}
+
+@code
+{
+    private YapimciRaporApiModel yapimciRaporApiModel;
+    private YapimciApiModel yapimciApiModel;
+
+    private bool collapseFiltre = true;
+
+    public string FiltreCssClass => collapseFiltre ? "collapse" : null;
+    public string FiltreText => collapseFiltre ? "<span class='oi oi-chevron-bottom'></span> Filtreleri Göster" : "<span class='oi oi-chevron-top'></span> Filtreleri Gizle";
+
+    private void ToggleFiltre()
+    {
+        collapseFiltre = !collapseFiltre;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await PageLoadAsync(new YapimciRaporFilterModel());
+    }
+
+    private async Task PageLoadAsync(YapimciRaporFilterModel filtre)
+    {
+        await JSRuntime.InvokeAsync<object>("destroyDataTable");
+        yapimciRaporApiModel = await YapimciService.GetYapimciRapor(filtre);
+        yapimciApiModel = await YapimciService.GetYapimcilarAsync();
+        yapimciRaporApiModel.Yapimcilar = yapimciApiModel.Yapimcilar;
+        await JSRuntime.InvokeAsync<object>("setDatePicker", "tarih");
+        await JSRuntime.InvokeAsync<object>("addDataTable");
+    }
+
+    private async Task SorgulaAsync()
+    {
+        yapimciRaporApiModel.Filtre.OyunBaslangicTarihi = BlazorBootstrapDatePickerHelper.GetBlazorStartDate();
+        yapimciRaporApiModel.Filtre.OyunBitisTarihi = BlazorBootstrapDatePickerHelper.GetBlazorEndDate();
+        await PageLoadAsync(yapimciRaporApiModel.Filtre);
+    }
+
+    private async Task TemizleAsync()
+    {
+        BlazorBootstrapDatePickerHelper.SetBlazorStartDate(null);
+        BlazorBootstrapDatePickerHelper.SetBlazorEndDate(null);
+        await PageLoadAsync(new YapimciRaporFilterModel());
+    }
+
+    private void YorumDetayiniGetir(string yorumcuAdi, string yorumAciklamasi, string yorumTarihi)
+    {
+        var modalParameters = new ModalParameters();
+        modalParameters.Add(nameof(YorumModel.YorumcuAdi), yorumcuAdi);
+        modalParameters.Add(nameof(YorumModel.Aciklamasi), yorumAciklamasi);
+        modalParameters.Add(nameof(YorumModel.TarihiText), yorumTarihi);
+        var modalOptions = new ModalOptions()
+        {
+            Animation = ModalAnimation.FadeInOut(0.5)
+        };
+        var modal = ModalService.Show<YapimciRaporYorumDetay>("Yorum Detayı", modalParameters, modalOptions);
+    }
+
+    private async Task ExcelRaporuAlAsync()
+    {
+        byte[] excelData = YapimciService.GetYapimciRaporExcel(yapimciRaporApiModel.YapimciRaporList);
+        await JSRuntime.SaveFileAsAsync("YapımcıRapor.xlsx", excelData);
+    }
+}

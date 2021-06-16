@@ -44,8 +44,8 @@
                 $.ajax({
                     url: "/odata/yapimcilar",
                     type: "post",
-                    data: { adi: $("#cadi").val() },
-                    dataType: "json",
+                    data: JSON.stringify({ Adi: $("#cadi").val() }),
+                    contentType: "application/json",
                     success: function (result) {
                         $("#message").html("İşlem başarılı:<br />" + JSON.stringify(result));
                     },
@@ -58,8 +58,8 @@
                 $.ajax({
                     url: "/odata/yapimcilar(" + $("#uid").val() + ")",
                     type: "put",
-                    data: { adi: $("#uadi").val() },
-                    dataType: "json",
+                    data: JSON.stringify({ Adi: $("#uadi").val() }),
+                    contentType: "application/json",
                     success: function (result) {
                         $("#message").html("İşlem başarılı:<br />" + JSON.stringify(result));
                     },

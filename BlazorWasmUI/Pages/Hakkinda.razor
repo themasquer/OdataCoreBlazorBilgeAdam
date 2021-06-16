@@ -1,0 +1,32 @@
+﻿@page "/hakkinda"
+
+@inject IHakkindaService HakkindaService
+
+<h1>Opedya Hakkında</h1>
+<hr />
+@if (hakkindaApiModel == null)
+{
+    <p>@AppConfig.Yukleniyor</p>
+}
+else
+{
+    <p>
+        OData RESTful Hizmetleri üzerine geliştirilen Opedya Blazor Web Assembly Web Uygulaması
+    </p>
+    <p>
+        Hazırlayan: @hakkindaApiModel.Hazirlayan
+    </p>
+    <p>
+        GitHub: <a href="https://github.com/themasquer/OdataCoreBlazorBilgeAdam" target="_blank">https://github.com/themasquer/OdataCoreBlazorBilgeAdam</a>
+    </p>
+}
+
+@code
+{
+    private HakkindaApiModel hakkindaApiModel;
+
+    protected override async Task OnInitializedAsync()
+    {
+        hakkindaApiModel = await HakkindaService.GetHazirlayanAsync();
+    }
+}

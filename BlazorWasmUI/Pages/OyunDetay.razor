@@ -1,0 +1,74 @@
+﻿@page "/oyundetay/{id:int}"
+
+@inject IOyunService OyunService
+@inject NavigationManager NavigationManager
+
+@if (!OyunSilmeMi)
+{
+    <h3>Oyun Detayı</h3>
+    <hr/>
+}
+
+@if (oyunApiModel == null)
+{
+    <p>@AppConfig.Yukleniyor</p>
+}
+else
+{
+    <div>
+        <dl class="row">
+            <dt class="col-2">
+                <DisplayName For="@(() => oyunApiModel.Oyun.Adi)" />
+            </dt>
+            <dd class="col-10">
+                @oyunApiModel.Oyun.Adi
+            </dd>
+            <dt class="col-2">
+                <DisplayName For="@(() => oyunApiModel.Oyun.PuaniText)" />
+            </dt>
+            <dd class="col-10">
+                @oyunApiModel.Oyun.PuaniText
+            </dd>
+            <dt class="col-2">
+                <DisplayName For="@(() => oyunApiModel.Oyun.Yapimci)" />
+            </dt>
+            <dd class="col-10">
+                @oyunApiModel.Oyun.Yapimci.Adi
+            </dd>
+            <dt class="col-2">
+                <DisplayName For="@(() => oyunApiModel.Oyun.TarihiText)" />
+            </dt>
+            <dd class="col-10">
+                @oyunApiModel.Oyun.TarihiText
+            </dd>
+        </dl>
+    </div>
+    <div>
+        @if (!OyunSilmeMi)
+        {
+            <hr />
+            <button @onclick="@OyunListesineDon" class="btn btn-warning"><span class="oi oi-x"></span> Oyun Listesine Dön</button>
+        }
+    </div>
+}
+
+@code
+{
+    private OyunApiModel oyunApiModel;
+
+    [Parameter]
+    public int Id { get; set; }
+
+    [Parameter]
+    public bool OyunSilmeMi { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        oyunApiModel = await OyunService.GetOyunAsync(Id);
+    }
+
+    private void OyunListesineDon()
+    {
+        NavigationManager.NavigateTo("/oyunlar");
+    }
+}

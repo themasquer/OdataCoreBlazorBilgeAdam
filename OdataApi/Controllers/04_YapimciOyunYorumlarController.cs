@@ -36,8 +36,7 @@ namespace OdataApi.Controllers
 
         #region ACTION'LAR
         [HttpPost]
-        //public IActionResult YapimciOyunAdiPuaniniGetir([FromODataUri] int key)
-        public IActionResult YapimciOyunAdiPuaniniGetir(int key) // [FromODataUri] attribute'u kullanılmadan da yazılabilir
+        public IActionResult YapimciOyunAdiPuaniniGetir([FromODataUri]int key)
         {
             var filter = new YapimciOyunYorumFilterModel()
             {

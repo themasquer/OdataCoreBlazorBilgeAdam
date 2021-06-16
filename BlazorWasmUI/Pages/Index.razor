@@ -1,0 +1,85 @@
+﻿@*
+    Microsoft .NET Core altyapısı ile backend dünyasına oldukça kaliteli ve sürdürülebilir bir ortam sundu. Frontend tarafına ise Blazor ile profesyonel bir dokunuş getirdi.
+
+    Rakipleri Angular, React ve Vue gibi teknolojilerin JavaScript ile geliştiriliyor olmasının aksine Blazor'ı C# ile geliştiriyoruz. Bu da tüm .NET dünyasının elimizin altında olmasını sağlıyor.
+
+    Blazor Web Assembly projeleri geliştirilirken Google Chrome kullanılmalıdır.
+
+    Routing @page "/..." ile yapılır.
+
+    @inject dependency injection için kullanılır. Örneğin @inject HttpClient Http denildiğinde runtime sırasında HttpClient tipinde Http somut sınıfının sayfada kullanılması sağlanır.
+
+    Statik dosyalarımız wwwroot altında tutulur.
+
+    Layout içerisinde ve sayfalarda çeşitli component'ler kullanılır.
+
+    Component'ler Single Page Application uygulamalarının ana parçasıdır.
+
+    Blazor'da önemli olan component mimarisi ve bu component'lerin birbirleriyle olan iletişimidir.
+
+    Bir component'te OnInitializedAsync() veya OnInitialized() methodları ile sayfa yüklendiğinde sayfa için gerekli kodlar çalıştırılır.
+
+    Blazor için kaynak olarak https://blazor-university.com kullanılabilir.
+
+    Layout component'in içinde veya default olarak ~/App.razor'da tanımlanabilir. Component içinde tanımlanan her zaman baskın gelir.
+
+    Solution Explorer'da örneğin MainLayout.razor copy paste yapıldığı zaman sorun olabiliyor. Bu yüzden Add New Item ile Razor Component eklemek daha sağlıklı.
+
+    Routing için @page ile component'lerde tanımlama yapmak yeterli. Giriş sayfası içinse @page "/" yapılır.
+
+    ~/wwwroot/index.html uygulamamızın giriş sayfası ve uygulama Single Page Application olduğu için bütün component yüklemeleri bu sayfada gerçekleşiyor.
+    Ayrıca bu sayfadaki <base href="/" /> tag'i kullanılarak giriş sayfası tanımlaması yapılır.
+
+    Birden çok @page tanımı ile bir sayfada birden çok route tanımı yapılabilir. Tüm route tanımları üzerinden istenen sayfaya ulaşılabilir. Örneğin:
+    @page "/todos"
+    @page "/todolist"
+
+    Eğer projeye eklediğimiz herhangi bir dosyada sayfada görüntüleme sırasında Türkçe karakterlerle ilgili sorun yaşanırsa eklenen dosya
+    Notepad ile açılıp encoding'i UTF-8 olarak değiştirilerek mevcut dosya üzerine kaydedilmelidir.
+
+    Razor Pages'da veriyi HttpClient üzerinden çektikten sonra if (data == null) kontrolü yapılmalıdır, çünkü veriler async olarak çekildiğinden obje null geldiğinde
+    object reference not set to an instance of an object hatası alınır.
+
+    Blazor'da mevcut input HTML tipleri:
+    <InputCheckbox />
+    <InputSelect />
+    <InputDate />
+    <InputNumber />
+    <InputTextArea />
+    <InputText />
+
+    Javascript kodlarını çalıştırmak için IJSRuntime interface'i ilgili Razor Component'a inject edilir (@inject IJSRuntime JSRuntime).
+    Bunun için ~/wwwroot/lib altına ihtiyaç varsa Javascript Css kütüphaneleri indirilir.
+    Daha sonra ~/wwwroot/js altına Javascript dosyası oluşturulur.
+    İhtiyaç varsa indirilen Javascript Css kütüphane referansları ile kendi oluşturduğumuz Javascript ve Css dosyaları index.html içerisine referans olarak eklenir.
+    Javascript dosyası içerisine çalıştırılmak istenen Javascript fonksiyonları yazılır.
+    Razor Component'ta code kısmında istenilen method içerisine await JSRuntime.InvokeAsync<object>(fonksiyonAdi); yazılır.
+    await JSRuntime.InvokeAsync<object>(fonksiyonAdi, parametreler); şeklinde de parametreler gönderilerek çalıştırılabilir.
+*@
+
+@page "/"
+@*<h1>Opedya</h1>*@
+<h1>@baslik</h1>
+
+<hr />
+
+@*Opedya web uygulamasına hoşgeldiniz.*@
+<p>@hosgeldiniz</p>
+
+<p>Versiyon: @AppConfig.Versiyon</p>
+@*
+    ~/Configs altında oluşturduğumuz AppConfig static class'ına erişebilmek için ~/_Import.razor altına
+    @using BlazorWasmUI.Configs satırı eklenmelidir.
+    Projemize eklediğimiz diğer class'lar için de ~/_Import.razor altına ilgili class'ların namespace'leri eklenmelidir.
+*@
+
+@code
+{
+    private string baslik = AppConfig.Baslik;
+    private string hosgeldiniz;
+
+    protected override void OnInitialized()
+    {
+        hosgeldiniz = AppConfig.Hosgeldiniz;
+    }
+}

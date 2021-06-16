@@ -1,0 +1,195 @@
+﻿@*
+    Bu sayfada DataTables kullandığımız için oluşturduğumuz table'a id olarak datatable veriyoruz. Bu ~/wwwroot/js/dataTables.js altında tanımlı.
+    Menüden diğer link'lere tıklandığında DataTables'ın bir parçası gelen sayfada kalmaya devam ediyor.
+    Bunu engellemek için ~/wwwroot/js/dataTables.js içerisine removeDataTable(); fonksiyonunu yazıyoruz.
+    Daha sonra ~/Shared/NavMenu.razor ve ~/Shared/UstMenu.razor dosyalarındaki link'lere menulink class'ını ekliyoruz.
+    Son olarak da ~/wwwroot/js/dataTables.js altına menulink class'ı için click fonksiyonunu yazıyoruz ve ~/wwwroot/index.html içerisine <script src="js/dataTables.js"></script> referansını ekliyoruz.
+    Bu sayfadaki table'ı DataTable yapabilmek için OnInitializedAsync() mehtodunda await JSRuntime.InvokeAsync<object>("addDataTable"); çağrıyoruz.
+
+    BlazoredModal kullanabilmek için:
+    1) NuGet'ten Blazored.Modal kütüphanesini indiriyoruz.
+    2) ~/Program.cs içerisinde Main methoduna builder.Services.AddBlazoredModal(); satırını ekliyoruz.
+    3) ~/_Imports.razor içerisine @using Blazored.Modal ile @using Blazored.Modal.Services satırlarını ekliyoruz.
+    4) ~/App.razor dosyasının ilk satırına <CascadingBlazoredModal> ve son satırına da </CascadingBlazoredModal> ekliyoruz.
+    5) ~/wwwroot/index.html içerisine <link href="_content/Blazored.Modal/blazored-modal.css" rel="stylesheet" /> ile <script src="_content/Blazored.Modal/blazored.modal.js"></script> ekliyoruz.
+    6) Eğer modal'ın genişliği değiştirilmek istenirse ~/wwwroot/css/blazoredmodal.css gibi yeni bir dosya eklenerek içerisindeki .blazored-modal class'ında genişlik tüm modal'lar için değiştirilebilir.
+       Daha sonra ~/wwwroot/index.html içerisine <link href="css/blazoredmodal.css" rel="stylesheet" /> referansı eklenmelidir.
+    7) Modal'ı özelleştirmek için ~/App.razor dosyasının ilk satırında aşağıdaki parametreler kullanılabilir veya kodda ModalOptions objesi oluşturulduktan sonra Show() methoduna parametre olarak gönderilebilir:
+       <CascadingBlazoredModal HideCloseButton="true" DisableBackgroundCancel="true" Class="custom-blazored-modal" Position="ModalPosition.BottomLeft" Animation="@ModalAnimation.FadeInOut(2)" />
+*@
+
+@page "/yorumlar"
+
+@inject IYorumService YorumService
+
+@inject IJSRuntime JSRuntime
+
+@inject NavigationManager NavigationManager
+
+@inject IModalService ModalService
+
+<h3>Yorumlar</h3>
+<hr />
+@if (yorumApiModel == null)
+{
+    <p>@AppConfig.Yukleniyor</p>
+}
+else
+{
+    <a href="" @onclick:preventDefault @onclick="@(() => YeniYorumEkleAsync())" title="Yeni Yorum"><span class="oi oi-plus"></span> Yeni Yorum</a>
+    @if (!string.IsNullOrWhiteSpace(hataMessage))
+    {
+        <p class="hata">@hataMessage</p>
+    }
+    <hr />
+    @if (yorumApiModel.Yorumlar != null && yorumApiModel.Yorumlar.Count > 0)
+    {
+        <table id="datatable" class="table" style="width: 100%;">
+            <thead>
+                <tr>
+                    <th style="width: 15%;">
+                        <DisplayName For="@(() => yorumApiModel.Yorumlar.FirstOrDefault().YorumcuAdi)" />
+                    </th>
+                    <th style="width: 10%;">
+                        <DisplayName For="@(() => yorumApiModel.Yorumlar.FirstOrDefault().TarihiText)" />
+                    </th>
+                    <th style="width: 25%;">
+                        <DisplayName For="@(() => yorumApiModel.Yorumlar.FirstOrDefault().OyunAdi)" />
+                    </th>
+                    <th style="width: 10%;">
+                        <DisplayName For="@(() => yorumApiModel.Yorumlar.FirstOrDefault().OyunPuaniText)" />
+                    </th>
+                    <th style="width: 20%;">
+                        <DisplayName For="@(() => yorumApiModel.Yorumlar.FirstOrDefault().OyunYapimciAdi)" />
+                    </th>
+                    <th>
+
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var yorum in yorumApiModel.Yorumlar)
+                {
+                    <tr>
+                        <td>
+
+                            @*@yorum.YorumcuAdi*@
+                            <a title="@yorum.Aciklamasi" style="cursor: zoom-in;">@yorum.YorumcuAdi <span class="oi oi-zoom-in"></span></a>
+
+                        </td>
+                        <td>
+                            @yorum.TarihiText
+                        </td>
+                        <td>
+                            @yorum.OyunAdi
+                        </td>
+                        <td>
+                            @yorum.OyunPuaniText
+                        </td>
+                        <td>
+                            @yorum.OyunYapimciAdi
+                        </td>
+                        <td>
+                            <button @onclick="@(() => YorumDetayiniGetirAsync(yorum.Id))" class="btn btn-link" title="Yorum Detayı"><span class="oi oi-info"></span> Detay</button>
+                            <button @onclick="@(() => YorumDuzenleAsync(yorum.Id))" class="btn btn-link" title="Yorum Düzenle"><span class="oi oi-pencil"></span> Düzenle</button>
+                            <button @onclick="@(() => YorumSilAsync(yorum.Id))" class="btn btn-link" title="Yorum Sil"><span class="oi oi-trash"></span> Sil</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+@code
+{
+    private YorumApiModel yorumApiModel;
+    private string hataMessage;
+
+    private ModalOptions modalOptions;
+
+    protected override async Task OnInitializedAsync()
+    {
+        yorumApiModel = await YorumService.GetYorumlarAsync();
+        await JSRuntime.InvokeAsync<object>("addDataTable");
+        modalOptions = new ModalOptions()
+        {
+            Animation = ModalAnimation.FadeInOut(0.5)
+        };
+    }
+
+    private async Task YeniYorumEkleAsync()
+    {
+        IModalReference modal;
+
+        //modal = ModalService.Show<YorumYeni>("Yeni Yorum");
+        // BlazordModal customization:
+        //ModalOptions modalOptions = new ModalOptions()
+        //{
+        //    HideCloseButton = true,
+        //    DisableBackgroundCancel = true,
+        //    Class = "custom-blazored-modal",
+
+        //    //Position = ModalPosition.BottomLeft,
+        //    Position = ModalPosition.Custom,
+        //    PositionCustomClass = "custom-blazored-modal-position",
+
+        //    Animation = ModalAnimation.FadeInOut(2)
+        //};
+        //modal = ModalService.Show<YorumYeni>("Yeni Yorum", modalOptions);
+
+        // Modal'a parametre göndermeden çağırma:
+        //modal = ModalService.Show<YorumYeniDuzenle>("Yeni Yorum", modalOptions);
+
+        // Modal'a parametre göndererek çağırma:
+        var modalParameters = new ModalParameters();
+        modalParameters.Add(nameof(YorumYeniDuzenle.Id), 0); // yeni yorum eklediğimiz için Id'yi 0 veriyoruz.
+        modal = ModalService.Show<YorumYeniDuzenle>("Yeni Yorum", modalParameters, modalOptions);
+
+        await ModalKapatildi(modal);
+    }
+
+    private async Task YorumDetayiniGetirAsync(int yorumId)
+    {
+        var modalParameters = new ModalParameters();
+        modalParameters.Add(nameof(YorumDetay.Id), yorumId);
+        var modal = ModalService.Show<YorumDetay>("Yorum Detayı", modalParameters, modalOptions);
+
+        //await ModalKapatildi(modal); // bu methodu çağırmaya gerek yok çünkü modal'dan bir sonuç dönüp bunu burada değerlendirmiyoruz
+    }
+
+    private async Task YorumDuzenleAsync(int yorumId)
+    {
+        var modalParameters = new ModalParameters();
+        modalParameters.Add(nameof(YorumYeniDuzenle.Id), yorumId);
+        var modal = ModalService.Show<YorumYeniDuzenle>("Yorum Düzenleme", modalParameters, modalOptions);
+
+        await ModalKapatildi(modal);
+    }
+
+    private async Task YorumSilAsync(int yorumId)
+    {
+        var silinecekYorumApiModel = await YorumService.GetYorumAsync(yorumId);
+        var modalParameters = new ModalParameters();
+        modalParameters.Add(nameof(YorumSil.Id), silinecekYorumApiModel.Yorum.Id);
+        modalParameters.Add(nameof(YorumSil.Yorumcu), silinecekYorumApiModel.Yorum.YorumcuAdi);
+        modalParameters.Add(nameof(YorumSil.Oyun), silinecekYorumApiModel.Yorum.OyunAdi);
+        modalParameters.Add(nameof(YorumSil.Tarih), silinecekYorumApiModel.Yorum.TarihiText);
+        var modal = ModalService.Show<YorumSil>("Yorum Silme", modalParameters, modalOptions);
+
+        await ModalKapatildi(modal);
+    }
+
+    private async Task ModalKapatildi(IModalReference modal)
+    {
+        var modalResult = await modal.Result;
+        if (!modalResult.Cancelled)
+        {
+            hataMessage = modalResult.Data.ToString();
+            if (string.IsNullOrWhiteSpace(hataMessage)) // işlem başarılı
+            {
+                NavigationManager.NavigateTo("yorumlar-redirect");  // jQuery DataTables kullandığımız ve DataTable'ı güncellemek için redirect yapıyoruz
+            }
+        }
+    }
+}

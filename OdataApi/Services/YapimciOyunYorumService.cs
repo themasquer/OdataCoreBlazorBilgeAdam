@@ -44,8 +44,8 @@ namespace OdataApi.Services
             {
                 if (filter.YapimciId.HasValue)
                     query = query.Where(q => q.Id == filter.YapimciId);
-                if (!string.IsNullOrWhiteSpace(filter.YapimciAdi))
-                    query = query.Where(y => y.YapimciAdi.ToLower().Contains(filter.YapimciAdi.ToLower().Trim()));
+                if (!string.IsNullOrWhiteSpace(filter.OyunAdi))
+                    query = query.Where(q => q.OyunAdi.ToLower().Contains(filter.OyunAdi.ToLower().Trim()));
                 if (filter.OyunBaslangicTarihi.HasValue)
                     query = query.Where(q => q.OyunTarihi >= filter.OyunBaslangicTarihi.Value);
                 if (filter.OyunBitisTarihi.HasValue)

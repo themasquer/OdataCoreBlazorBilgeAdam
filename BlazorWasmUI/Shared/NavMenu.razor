@@ -1,0 +1,52 @@
+﻿<div class="top-row pl-4 navbar navbar-dark">
+
+    @*<a class="navbar-brand" href="">Opedya</a>*@
+    <a class="navbar-brand menulink" href="">@AppConfig.Baslik</a>
+
+    <button class="navbar-toggler" @onclick="ToggleNavMenu">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <ul class="nav flex-column">
+        <li class="nav-item px-3">
+            <NavLink class="nav-link menulink" href="" Match="NavLinkMatch.All">
+                @*
+                NavLinkMatch.All: Eğer href değeri gelen url'nin tümü ile eşleşirse bu link active olur,
+                örneğin http://www.domain.com. Genelde giriş url'leri için kullanılır.
+                NavLinkMatch.Prefix: Eğer href değeri gelen url'nin herhangi bir ön eki ile eşleşirse bu link active olur ve
+                birden çok ön ek eşleşmesi varsa tüm eşleşen link'ler active olur,
+                örneğin http://www.domain.com/counter-zero. Eğer aşağıdaki NavLink'lerdeki gibi Match özelliği yazılmazsa NavLinkMatch.Prefix default'tur.
+                *@
+                <span class="oi oi-home" aria-hidden="true"></span> Hoşgeldiniz
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link menulink" href="oyunlar">
+                <span class="oi oi-list" aria-hidden="true"></span> Oyunlar
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link menulink" href="yapimcilar">
+                <span class="oi oi-list" aria-hidden="true"></span> Yapımcılar
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link menulink" href="yorumlar">
+                <span class="oi oi-list" aria-hidden="true"></span> Yorumlar
+            </NavLink>
+        </li>
+    </ul>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}

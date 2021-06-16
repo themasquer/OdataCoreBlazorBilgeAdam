@@ -1,0 +1,333 @@
+﻿@page "/oyunlar"
+
+@inject IOyunService OyunService
+@inject IYapimciService YapimciService
+
+@inject IJSRuntime JSRuntime
+
+@inject NavigationManager NavigationManager
+
+<h3>Oyunlar</h3>
+<hr />
+@if (oyunApiModel == null)
+{
+    <p>@AppConfig.Yukleniyor</p>
+}
+else
+{
+    <a href="" @onclick:preventDefault @onclick="YeniOyunEkle" title="Yeni Oyun"><span class="oi oi-plus"></span> Yeni Oyun</a>
+    <hr />
+    <EditForm Model="@oyunApiModel.Filtre" OnValidSubmit="@SorgulaAsync" autocomplete="off">
+        @if (oyunApiModel.Count == 0)
+        {
+            <p class="text-success">@AppConfig.KayitBulunamadi</p>
+        }
+        else
+        {
+            <p class="text-success">@oyunApiModel.Count @AppConfig.KayitBulundu</p>
+        }
+        <hr/>
+        <div class="row">
+            <div class="col-6">
+                <div class="form-group">
+                    <DisplayName For="@(() => oyunApiModel.Filtre.Adi)" /> @* Hata vermeden kullanabilmek için ~/Helpers/DisplayName.razor sayfasının Visual Studio'da kapatılması gerek! *@
+                    <InputText @bind-Value="@oyunApiModel.Filtre.Adi" class="form-control" placeholder="Oyun adı girin..." />@* bind-Value yazımına dikkat *@
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <DisplayName For="@(() => oyunApiModel.Filtre.YapimciIdText)" />
+                    <InputSelect @bind-Value="@oyunApiModel.Filtre.YapimciIdText" class="form-control">
+                        <option value="">-- Tüm Yapımcılar --</option>
+                        @foreach (var yapimci in oyunApiModel.Yapimcilar)
+                        {
+                            <option value="@yapimci.Id">@yapimci.Adi</option>
+                        }
+                    </InputSelect>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <div class="form-group">
+                    <DisplayName For="@(() => oyunApiModel.Filtre.BaslangicPuaniText)"/>
+                    <div class="input-group">
+                        <InputText @bind-Value="@oyunApiModel.Filtre.BaslangicPuaniText" type="number" class="form-control" placeholder="Başlangıç puanı girin..."/>
+                        <span class="input-group-text">-</span>
+                        <InputText @bind-Value="@oyunApiModel.Filtre.BitisPuaniText" type="number" class="form-control" placeholder="Bitiş puanı girin..."/>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <DisplayName For="@(() => oyunApiModel.Filtre.BaslangicTarihiText)"/>
+                    <div class="input-group">
+                        @*<InputText @bind-Value="@oyunApiModel.Filtre.BaslangicTarihiText" class="form-control tarih" placeholder="Başlangıç tarihi girin..." />*@
+                        @*
+                            Bootstrap Datepicker kullandığımız ve tarih değerini elle girmek yerine Javascript ile değiştirdiğimiz için
+                            seçtiğimiz tarihi oyunApiModel.Filtre.BaslangicTarihiText özelliğine bind-Value ile atayamıyoruz.
+
+                            oyunApiModel.Filtre.BaslangicTarihiText özelliğini güncelleyebilmek için tarih değiştiğinde önce bir
+                            Javascript fonksiyonu çağırıyoruz. Bu çağrılan fonksiyon static bir C# methodunu çağırıyor ve
+                            static bir özelliğe Javascript ile gönderilen input'un değerini atıyor.
+
+                            Daha sonra Sorgula butonuna basıldığında oyunApiModel.Filtre.BaslangicTarihiText özelliğine daha önce
+                            atadığımız C# static özelliğini atayabiliyoruz.
+                        *@
+                        <input onchange="setBlazorDate('BlazorWasmUI', 'SetBlazorStartDate', this);" class="form-control tarih" placeholder="Başlangıç tarihi girin..."/>
+
+                        <span class="input-group-text">-</span>
+
+                        @*<InputText @bind-Value="@oyunApiModel.Filtre.BitisTarihiText" class="form-control tarih" placeholder="Bitiş tarihi girin..." />*@
+                        <input onchange="setBlazorDate('BlazorWasmUI', 'SetBlazorEndDate', this);" class="form-control tarih" placeholder="Bitiş tarihi girin..."/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary"><span class="oi oi-magnifying-glass"></span> Sorgula</button>
+                    &nbsp;
+
+                    @* Buton form içinde olduğu için type="submit" vermesek bile formu submit ediyor, bu yüzden bu davranışı engellemek için @onclick:preventDefault yazıyoruz. *@
+                    <button class="btn btn-info" @onclick:preventDefault @onclick="@TemizleAsync"><span class="oi oi-reload"></span> Temizle</button>
+
+                </div>
+            </div>
+        </div>
+        <hr/>
+        @if (oyunApiModel.Count > 0)
+        {
+            <div class="row sayfa">
+                <div class="col-1">
+                    Sayfa
+                </div>
+                <div class="col-2">
+
+                    @*<InputSelect @bind-Value="oyunApiModel.Sayfa.PageNumber" class="form-control">*@
+                    @* Eğer input değiştiğinde bir C# methodunu çalıştırmak istiyorsak InputSelect ile bind-Value
+                        kullanmak yerine, select @onchange=method kullanarak methoda parametre olarak ChangeEventArgs
+                        tipinde bir parametre gönderip seçilen değeri alarak diğer kodları da çalıştırabiliriz.
+                    *@
+                    @* Sorgula butonuna tıklandığında sayfa numarasını 1'e set ettiğimiz için burada if ile kontrol yapıp
+                        option'a duruma göre selected ekliyoruz.
+                    *@
+                    @* Sayfa numarası değiştiğinde sorgulama yapsın: *@
+                    <select @onchange="SayfaNoIleSorgulaAsync" class="form-control">
+                        @foreach (int pageNumber in oyunApiModel.Sayfa.PageNumbers)
+                        {
+                            @if (pageNumber == oyunApiModel.Sayfa.PageNumber)
+                            {
+                                <option value="@pageNumber" selected>@pageNumber</option>
+                            }
+                            else
+                            {
+                                <option value="@pageNumber">@pageNumber</option>
+                            }
+                        }
+                        @*</InputSelect>*@
+                    </select>
+
+                </div>
+                <div class="col-2">
+                    Sayfa Kayıt Sayısı
+                </div>
+                <div class="col-2">
+                    <select @onchange="SayfaKayitSayisiIleSorgulaAsync" class="form-control">
+                        @foreach (int recordsPerPageCount in oyunApiModel.Sayfa.RecordsPerPageCountList)
+                        {
+                            <option value="@recordsPerPageCount">@recordsPerPageCount</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th style="width: 30%;">
+
+                                @*<DisplayName For="@(() => oyunApiModel.Oyunlar.FirstOrDefault().Adi)" />*@
+                                <a href="" @onclick:preventDefault @onclick="() => SiraIleSorgulaAsync(adiDisplayName)">
+                                    @adiDisplayName <span class="@adiSiraIcon"></span>
+                                </a>
+
+                            </th>
+                            <th style="width: 10%;">
+
+                                @*<DisplayName For="@(() => oyunApiModel.Oyunlar.FirstOrDefault().TarihiText)" />*@
+                                <a href="" @onclick:preventDefault @onclick="() => SiraIleSorgulaAsync(tarihiDisplayName)">
+                                    @tarihiDisplayName <span class="@tarihiSiraIcon"></span>
+                                </a>
+
+                            </th>
+                            <th style="width: 10%;">
+
+                                @*<DisplayName For="@(() => oyunApiModel.Oyunlar.FirstOrDefault().PuaniText)" />*@
+                                <a href="" @onclick:preventDefault @onclick="() => SiraIleSorgulaAsync(puaniDisplayName)">
+                                    @puaniDisplayName <span class="@puaniSiraIcon"></span>
+                                </a>
+
+                            </th>
+                            <th style="width: 30%;">
+
+                                @*<DisplayName For="@(() => oyunApiModel.Oyunlar.FirstOrDefault().YapimciIdText)" />*@
+                                <a href="" @onclick:preventDefault @onclick="() => SiraIleSorgulaAsync(yapimciDisplayName)">
+                                    @yapimciDisplayName <span class="@yapimciSiraIcon"></span>
+                                </a>
+
+                            </th>
+                            <th>
+
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var oyun in oyunApiModel.Oyunlar)
+                        {
+                            <tr>
+                                <td>
+                                    @oyun.Adi
+                                </td>
+                                <td>
+                                    @oyun.TarihiText
+                                </td>
+                                <td>
+                                    @oyun.PuaniText
+                                </td>
+                                <td>
+                                    @oyun.Yapimci.Adi
+                                </td>
+                                <td>
+                                    <button @onclick="@(() => OyunDetayiniGetir(oyun.Id))" class="btn btn-link" title="Oyun Detayı"><span class="oi oi-info"></span> Detay</button>
+                                    <button @onclick="@(() => OyunDuzenle(oyun.Id))" class="btn btn-link" title="Oyun Düzenle"><span class="oi oi-pencil"></span> Düzenle</button>
+                                    <button @onclick="@(() => OyunSil(oyun.Id))" class="btn btn-link" title="Oyun Sil"><span class="oi oi-trash"></span> Sil</button>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+    </EditForm>
+}
+
+@code
+{
+    private OyunApiModel oyunApiModel;
+    private YapimciApiModel yapimciApiModel;
+    private string adiDisplayName;
+    private string tarihiDisplayName;
+    private string puaniDisplayName;
+    private string yapimciDisplayName;
+    private string siraExpression;
+    private bool siraDirectionAscending;
+    private string adiSiraIcon;
+    private string tarihiSiraIcon;
+    private string puaniSiraIcon;
+    private string yapimciSiraIcon;
+
+    protected override async Task OnInitializedAsync()
+    {
+        adiDisplayName = DataAnnotationsHelper.GetDisplayName<OyunModel>(model => model.Adi);
+        tarihiDisplayName = DataAnnotationsHelper.GetDisplayName<OyunModel>(model => model.TarihiText);
+        puaniDisplayName = DataAnnotationsHelper.GetDisplayName<OyunModel>(model => model.PuaniText);
+        yapimciDisplayName = DataAnnotationsHelper.GetDisplayName<OyunModel>(model => model.YapimciIdText);
+        siraExpression = adiDisplayName;
+        siraDirectionAscending = true;
+        SiraIconDegistir();
+        await PageLoadAsync(new OyunFilterModel(), new PageModel(), new OrderModel(siraExpression, siraDirectionAscending));
+    }
+
+    private async Task PageLoadAsync(OyunFilterModel filtre, PageModel sayfa, OrderModel sira)
+    {
+        oyunApiModel = await OyunService.GetOyunlarAsync(filtre, sayfa, sira);
+        yapimciApiModel = await YapimciService.GetYapimcilarAsync();
+        oyunApiModel.Yapimcilar = yapimciApiModel.Yapimcilar;
+        await JSRuntime.InvokeAsync<object>("setDatePicker", "tarih");
+    }
+
+    private async Task SorgulaAsync()
+    {
+        oyunApiModel.Filtre.BaslangicTarihiText = BlazorBootstrapDatePickerHelper.GetBlazorStartDate();
+        oyunApiModel.Filtre.BitisTarihiText = BlazorBootstrapDatePickerHelper.GetBlazorEndDate();
+        oyunApiModel.Sayfa.PageNumber = 1;
+        await PageLoadAsync(oyunApiModel.Filtre, oyunApiModel.Sayfa, oyunApiModel.Sira);
+    }
+
+    private async Task TemizleAsync()
+    {
+        BlazorBootstrapDatePickerHelper.SetBlazorStartDate(null);
+        BlazorBootstrapDatePickerHelper.SetBlazorEndDate(null);
+        siraExpression = adiDisplayName;
+        siraDirectionAscending = true;
+        SiraIconDegistir();
+        await PageLoadAsync(new OyunFilterModel(), new PageModel(), new OrderModel(siraExpression, siraDirectionAscending));
+    }
+
+    private async Task SayfaNoIleSorgulaAsync(ChangeEventArgs e)
+    {
+        if (e != null && e.Value != null)
+            oyunApiModel.Sayfa.PageNumber = Convert.ToInt32(e.Value.ToString());
+        await PageLoadAsync(oyunApiModel.Filtre, oyunApiModel.Sayfa, oyunApiModel.Sira);
+    }
+
+    private async Task SiraIleSorgulaAsync(string sutunAdi)
+    {
+        siraExpression = sutunAdi;
+        siraDirectionAscending = !siraDirectionAscending;
+        SiraIconDegistir();
+        oyunApiModel.Sira.Expression = siraExpression;
+        oyunApiModel.Sira.DirectionAscending = siraDirectionAscending;
+        await PageLoadAsync(oyunApiModel.Filtre, oyunApiModel.Sayfa, oyunApiModel.Sira);
+    }
+
+    private async Task SayfaKayitSayisiIleSorgulaAsync(ChangeEventArgs e)
+    {
+        if (e != null && e.Value != null)
+        {
+            oyunApiModel.Sayfa.RecordsPerPageCount = Convert.ToInt32(e.Value.ToString());
+            oyunApiModel.Sayfa.PageNumber = 1;
+        }
+        await PageLoadAsync(oyunApiModel.Filtre, oyunApiModel.Sayfa, oyunApiModel.Sira);
+    }
+
+    private void SiraIconDegistir()
+    {
+        adiSiraIcon = "";
+        tarihiSiraIcon = "";
+        puaniSiraIcon = "";
+        yapimciSiraIcon = "";
+        if (siraExpression == adiDisplayName)
+            adiSiraIcon = siraDirectionAscending ? "oi oi-caret-top" : "oi oi-caret-bottom";
+        else if (siraExpression == tarihiDisplayName)
+            tarihiSiraIcon = siraDirectionAscending ? "oi oi-caret-top" : "oi oi-caret-bottom";
+        else if (siraExpression == puaniDisplayName)
+            puaniSiraIcon = siraDirectionAscending ? "oi oi-caret-top" : "oi oi-caret-bottom";
+        else
+            yapimciSiraIcon = siraDirectionAscending ? "oi oi-caret-top" : "oi oi-caret-bottom";
+    }
+
+    private void YeniOyunEkle()
+    {
+        NavigationManager.NavigateTo("/oyunyeni");
+    }
+
+    private void OyunDetayiniGetir(int id)
+    {
+        NavigationManager.NavigateTo("/oyundetay/" + id);
+    }
+
+    private void OyunDuzenle(int id)
+    {
+        NavigationManager.NavigateTo("/oyunduzenle/" + id);
+    }
+
+    private void OyunSil(int id)
+    {
+        NavigationManager.NavigateTo("/oyunsil/" + id);
+    }
+}

@@ -10,7 +10,7 @@ using OdataApi.Contexts;
 namespace OdataApi.Migrations
 {
     [DbContext(typeof(DefaultContext))]
-    [Migration("20210523115112_v1")]
+    [Migration("20210530170136_v1")]
     partial class v1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

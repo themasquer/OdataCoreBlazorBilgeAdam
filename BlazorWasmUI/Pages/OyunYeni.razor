@@ -1,0 +1,110 @@
+﻿@page "/oyunyeni"
+
+@inject IOyunService OyunService
+@inject IYapimciService YapimciService
+
+@inject IJSRuntime JSRuntime
+
+@inject NavigationManager NavigationManager
+
+<h3>Yeni Oyun</h3>
+<hr />
+
+@if (oyunApiModel == null)
+{
+    <p>@AppConfig.Yukleniyor</p>
+}
+else
+{
+    <EditForm Model="@oyunApiModel.Oyun" OnValidSubmit="@EkleAsync" autocomplete="off">
+        @if (!string.IsNullOrWhiteSpace(hataMessage))
+        {
+            <p class="hata">@hataMessage</p>
+        }
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <DisplayName For="@(() => oyunApiModel.Oyun.Adi)" />
+
+            @*<InputText @bind-Value="@oyunApiModel.Oyun.Adi" class="form-control" placeholder="Oyun adı girin..."/>*@
+
+            @* Bu şekilde Angular'da olduğu gibi girilen değer başka bir HTML elemanında yazdırılabilir. bind-value yazımına dikkat! *@
+            <div class="input-group">
+                <input @bind-value="@oyunApiModel.Oyun.Adi" @bind-value:event="oninput" class="form-control text-primary" />
+                <span class="input-group-text">:</span>
+                &nbsp;<label class="text-primary" style="width: 50%;">@oyunApiModel.Oyun.Adi</label>
+            </div>
+
+            <ValidationMessage For="@(() => oyunApiModel.Oyun.Adi)" />
+        </div>
+        <div class="form-group">
+            <DisplayName For="@(() => oyunApiModel.Oyun.PuaniText)" />
+            <InputText @bind-Value="@oyunApiModel.Oyun.PuaniText" type="number" class="form-control" placeholder="Puanı girin..." />
+            <ValidationMessage For="@(() => oyunApiModel.Oyun.PuaniText)" />
+        </div>
+        <div class="form-group">
+            <DisplayName For="@(() => oyunApiModel.Oyun.YapimciIdText)" />
+            <InputSelect @bind-Value="@oyunApiModel.Oyun.YapimciIdText" class="form-control">
+                <option value="">-- Yapımcı Seçin --</option>
+                @foreach (var yapimci in oyunApiModel.Yapimcilar)
+                    {
+                    <option value="@yapimci.Id">@yapimci.Adi</option>
+                    }
+            </InputSelect>
+            <ValidationMessage For="@(() => oyunApiModel.Oyun.YapimciIdText)" />
+        </div>
+        <div class="form-group">
+            <DisplayName For="@(() => oyunApiModel.Oyun.TarihiText)" />
+            <input onchange="setBlazorDate('BlazorWasmUI', 'SetBlazorDate', this);" class="form-control tarih" placeholder="Tarihi girin..." />
+            <span class="validation-message">@tarihValidationMessage</span>
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-success"><span class="oi oi-check"></span> Ekle</button>
+            &nbsp;
+            <button @onclick:preventDefault @onclick="@OyunListesineDon" class="btn btn-warning"><span class="oi oi-x"></span> Oyun Listesine Dön</button>
+        </div>
+    </EditForm>
+}
+
+@code
+{
+    private OyunApiModel oyunApiModel;
+    private YapimciApiModel yapimciApiModel;
+    private string hataMessage;
+    private string tarihValidationMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        yapimciApiModel = await YapimciService.GetYapimcilarAsync();
+        oyunApiModel = new OyunApiModel
+        {
+            Oyun = new OyunModel(),
+            Yapimcilar = yapimciApiModel.Yapimcilar
+        };
+        await JSRuntime.InvokeAsync<object>("setDatePicker", "tarih");
+    }
+
+    private void OyunListesineDon()
+    {
+        NavigationManager.NavigateTo("/oyunlar");
+    }
+
+    private async Task EkleAsync()
+    {
+        hataMessage = "";
+        tarihValidationMessage = "";
+        oyunApiModel.Oyun.TarihiText = BlazorBootstrapDatePickerHelper.GetBlazorDate();
+        if (string.IsNullOrWhiteSpace(oyunApiModel.Oyun.TarihiText))
+        {
+            tarihValidationMessage = "Oyun Tarihi zorunludur!";
+            return;
+        }
+        var resultStatusCode = await OyunService.AddOyunAsync(oyunApiModel.Oyun);
+        if (resultStatusCode != HttpStatusCode.OK)
+        {
+            hataMessage = AppConfig.Hata;
+            return;
+        }
+        NavigationManager.NavigateTo("/oyunlar");
+    }
+}

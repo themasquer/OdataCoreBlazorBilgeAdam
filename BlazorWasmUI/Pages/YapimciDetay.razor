@@ -1,0 +1,140 @@
+﻿@inject IYapimciService YapimciService
+
+<h3>@Baslik</h3>
+<hr />
+
+@if (yapimciApiModel == null)
+{
+    <p>@AppConfig.Yukleniyor</p>
+}
+else
+{
+    <EditForm Model="@yapimciApiModel.Yapimci" OnValidSubmit="@KaydetAsync">
+        <DataAnnotationsValidator />
+        @*<ValidationSummary />*@
+        <div class="form-group row">
+            <DisplayName For="@(() => yapimciApiModel.Yapimci.Adi)" class="col-1 col-form-label" />
+            <div class="col-5">
+                <InputText @bind-Value="@yapimciApiModel.Yapimci.Adi" @attributes="yapimciAdiAttributes" />
+                <ValidationMessage For="@(() => yapimciApiModel.Yapimci.Adi)" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="offset-1 col-5">
+                @if (!YapimciDetayMi)
+                {
+                    <button type="submit" class="btn btn-success"><span class="oi oi-check"></span> Kaydet</button>
+                    @:&nbsp;
+                    <button class="btn btn-info" @onclick:preventDefault @onclick="Temizle"><span class="oi oi-reload"></span> Temizle</button>
+                    @:&nbsp;
+                    if (Id != 0) // mevcut yapımcı
+                    {
+                        <button class="btn btn-danger" @onclick:preventDefault @onclick="SilAsync"><span class="oi oi-trash"></span> Sil</button>
+                        @:&nbsp;
+                    }
+                }
+                <button @onclick:preventDefault @onclick="@YapimciDetayKapat" class="btn btn-warning"><span class="oi oi-x"></span> Kapat</button>
+                <br />
+                <br />
+                @if (!string.IsNullOrWhiteSpace(hataMessage))
+                {
+                    <p class="hata">@hataMessage</p>
+                }
+            </div>
+        </div>
+    </EditForm>
+}
+
+@code
+{
+    private YapimciApiModel yapimciApiModel;
+    private string hataMessage;
+    private bool silinecekMi;
+    private Dictionary<string, object> yapimciAdiAttributes;
+
+    [Parameter]
+    public int Id { get; set; }
+
+    [Parameter]
+    public string Baslik { get; set; }
+
+    [Parameter]
+    public bool YapimciDetayMi { get; set; }
+
+    [Parameter]
+    public Action<YapimciModel> YapimciDetayKaydedildi { get; set; }
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> YapimciDetayKapat { get; set; }
+
+    protected override async Task OnParametersSetAsync() // Parametre attribute'una sahip özellikler set edildikten sonra çalışır
+    {
+        silinecekMi = false;
+        yapimciAdiAttributes = new Dictionary<string, object>()
+        {
+            { "class", "form-control" },
+            { "placeholder", "Yapımcı adı girin..." }
+        };
+        if (Id == 0) // yeni yapımcı
+        {
+            yapimciApiModel = new YapimciApiModel()
+            {
+                Yapimci = new YapimciModel()
+            };
+        }
+        else // mevcut yapımcı
+        {
+            yapimciApiModel = await YapimciService.GetYapimciAsync(Id);
+            if (YapimciDetayMi)
+                yapimciAdiAttributes.Add("disabled", "disabled");
+        }
+    }
+
+    private async Task KaydetAsync()
+    {
+        YapimciModel yapimciSonuc;
+        hataMessage = "";
+        if (Id == 0) // yeni yapımcı
+        {
+            yapimciSonuc = await YapimciService.AddYapimciAsync(yapimciApiModel.Yapimci);
+        }
+        else // mevcut yapımcı
+        {
+            if (!silinecekMi)
+            {
+                yapimciSonuc = await YapimciService.UpdateYapimciAsync(yapimciApiModel.Yapimci);
+            }
+            else
+            {
+                SonucApiModel sonucApiModel = await YapimciService.DeleteYapimciAsync(yapimciApiModel.Yapimci.Id);
+                if (!sonucApiModel.BasariliMi)
+                {
+                    hataMessage = sonucApiModel.Hata.Mesaj;
+                    return;
+                }
+                yapimciSonuc = yapimciApiModel.Yapimci;
+                yapimciSonuc.SilindiMi = true;
+            }
+        }
+        if (yapimciSonuc == null)
+        {
+            hataMessage = AppConfig.Hata;
+            return;
+        }
+        YapimciDetayKaydedildi?.Invoke(yapimciSonuc);
+    }
+
+    private async Task SilAsync()
+    {
+        silinecekMi = true;
+        await KaydetAsync();
+    }
+
+    private void Temizle()
+    {
+        yapimciApiModel.Yapimci = new YapimciModel()
+        {
+            Id = Id
+        };
+    }
+}

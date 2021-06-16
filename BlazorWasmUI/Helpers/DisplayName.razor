@@ -1,0 +1,22 @@
+﻿@using System.Linq.Expressions
+
+@namespace BlazorWasmUI.Helpers
+
+@typeparam T
+
+<span @attributes="Attributes">@span</span>
+
+@code {
+    [Parameter]
+    public Expression<Func<T>> For { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> Attributes { get; set; }
+
+    private string span => GetDisplayName();
+
+    private string GetDisplayName()
+    {
+        return DataAnnotationsHelper.GetDisplayName(For);
+    }
+}

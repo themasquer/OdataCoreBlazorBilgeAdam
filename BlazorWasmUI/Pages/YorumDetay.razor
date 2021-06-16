@@ -1,0 +1,68 @@
+﻿@inject IYorumService YorumService
+
+@if (yorumApiModel == null)
+{
+    <p>@AppConfig.Yukleniyor</p>
+}
+else
+{
+    <div>
+        <dl class="row">
+            <dt class="col-3">
+                <DisplayName For="@(() => yorumApiModel.Yorum.YorumcuAdi)" />
+            </dt>
+            <dd class="col-9">
+                @yorumApiModel.Yorum.YorumcuAdi
+            </dd>
+            <dt class="col-3">
+                <DisplayName For="@(() => yorumApiModel.Yorum.Aciklamasi)" />
+            </dt>
+            <dd class="col-9">
+                @yorumApiModel.Yorum.Aciklamasi
+            </dd>
+            <dt class="col-3">
+                <DisplayName For="@(() => yorumApiModel.Yorum.TarihiText)" />
+            </dt>
+            <dd class="col-9">
+                @yorumApiModel.Yorum.TarihiText
+            </dd>
+            <dt class="col-3">
+                <DisplayName For="@(() => yorumApiModel.Yorum.OyunAdi)" />
+            </dt>
+            <dd class="col-9">
+                @yorumApiModel.Yorum.OyunAdi
+            </dd>
+            <dt class="col-3">
+                <DisplayName For="@(() => yorumApiModel.Yorum.OyunPuaniText)" />
+            </dt>
+            <dd class="col-9">
+                @yorumApiModel.Yorum.OyunPuaniText
+            </dd>
+            <dt class="col-3">
+                <DisplayName For="@(() => yorumApiModel.Yorum.OyunTarihiText)" />
+            </dt>
+            <dd class="col-9">
+                @yorumApiModel.Yorum.OyunTarihiText
+            </dd>
+            <dt class="col-3">
+                <DisplayName For="@(() => yorumApiModel.Yorum.OyunYapimciAdi)" />
+            </dt>
+            <dd class="col-9">
+                @yorumApiModel.Yorum.OyunYapimciAdi
+            </dd>
+        </dl>
+    </div>
+}
+
+@code
+{
+    private YorumApiModel yorumApiModel;
+
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        yorumApiModel = await YorumService.GetYorumAsync(Id);
+    }
+}

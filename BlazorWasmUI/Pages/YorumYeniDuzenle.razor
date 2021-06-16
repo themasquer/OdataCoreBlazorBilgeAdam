@@ -1,0 +1,93 @@
+﻿@inject IYorumService YorumService
+@inject IOyunService OyunService
+
+@if (yorumApiModel == null)
+{
+    <p>@AppConfig.Yukleniyor</p>
+}
+else
+{
+    <EditForm Model="@yorumApiModel.Yorum" OnValidSubmit="@KaydetAsync" autocomplete="off">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <DisplayName For="@(() => yorumApiModel.Yorum.YorumcuAdi)" />
+            <InputText @bind-Value="@yorumApiModel.Yorum.YorumcuAdi" class="form-control" placeholder="Yorumcu adı girin..." />
+            <ValidationMessage For="@(() => yorumApiModel.Yorum.YorumcuAdi)" />
+        </div>
+        <div class="form-group">
+            <DisplayName For="@(() => yorumApiModel.Yorum.OyunIdText)" />
+            <InputSelect @bind-Value="@yorumApiModel.Yorum.OyunIdText" class="form-control">
+                <option value="">-- Oyun Seçin --</option>
+                @foreach (var oyun in yorumApiModel.Oyunlar)
+                    {
+                    <option value="@oyun.Id">@oyun.Adi</option>
+                    }
+            </InputSelect>
+            <ValidationMessage For="@(() => yorumApiModel.Yorum.OyunIdText)" />
+        </div>
+        <div class="form-group">
+            <DisplayName For="@(() => yorumApiModel.Yorum.Aciklamasi)" />
+            <InputTextArea @bind-Value="@yorumApiModel.Yorum.Aciklamasi" class="form-control" placeholder="Açıklama girin..." />
+            <ValidationMessage For="@(() => yorumApiModel.Yorum.Aciklamasi)" />
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-success"><span class="oi oi-check"></span> Kaydet</button>
+            &nbsp;
+            <button @onclick:preventDefault @onclick="@Temizle" class="btn btn-info"><span class="oi oi-reload"></span> Temizle</button>
+        </div>
+    </EditForm>
+}
+
+@code
+{
+    private YorumApiModel yorumApiModel;
+    private OyunApiModel oyunApiModel;
+
+    [Parameter]
+    public int Id { get; set; }
+
+    [CascadingParameter]
+    private BlazoredModalInstance Modal { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        string oyunAdiDisplayName = DataAnnotationsHelper.GetDisplayName<OyunModel>(model => model.Adi);
+        oyunApiModel = await OyunService.GetOyunlarAsync();
+        if (Id == 0) // yeni yorum
+        {
+            yorumApiModel = new YorumApiModel
+            {
+                Yorum = new YorumModel()
+            };
+        }
+        else // mevcut yorum
+        {
+            yorumApiModel = await YorumService.GetYorumAsync(Id);
+        }
+        yorumApiModel.Oyunlar = oyunApiModel.Oyunlar;
+    }
+
+    private void Temizle()
+    {
+        yorumApiModel.Yorum = new YorumModel()
+        {
+            Id = Id
+        };
+    }
+
+    private async Task KaydetAsync()
+    {
+        string hataMessage = "";
+        HttpStatusCode resultStatusCode;
+        if (Id == 0) // yeni yorum
+            resultStatusCode = await YorumService.AddYorumAsync(yorumApiModel.Yorum);
+        else // mevcut yorum
+            resultStatusCode = await YorumService.UpdateYorumAsync(yorumApiModel.Yorum);
+        if (resultStatusCode != HttpStatusCode.OK)
+        {
+            hataMessage = AppConfig.Hata;
+        }
+        await Modal.CloseAsync(ModalResult.Ok(hataMessage));
+    }
+}

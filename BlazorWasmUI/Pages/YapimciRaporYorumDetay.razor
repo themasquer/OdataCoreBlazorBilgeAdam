@@ -1,0 +1,49 @@
+﻿<div>
+    <dl class="row">
+        <dt class="col-3">
+            <DisplayName For="@(() => yorumModel.YorumcuAdi)" />
+        </dt>
+        <dd class="col-9">
+            @yorumModel.YorumcuAdi
+        </dd>
+        <dt class="col-3">
+            <DisplayName For="@(() => yorumModel.Aciklamasi)" />
+        </dt>
+        <dd class="col-9">
+            @yorumModel.Aciklamasi
+        </dd>
+        <dt class="col-3">
+            <DisplayName For="@(() => yorumModel.TarihiText)" />
+        </dt>
+        <dd class="col-9">
+            @yorumModel.TarihiText
+        </dd>
+    </dl>
+</div>
+
+@code
+{
+    private YorumModel yorumModel;
+
+    [Parameter]
+    public string YorumcuAdi { get; set; }
+
+    [Parameter]
+    public string Aciklamasi { get; set; }
+
+    [Parameter]
+    public string TarihiText { get; set; }
+
+    [CascadingParameter]
+    private BlazoredModalInstance Modal { get; set; }
+
+    protected override void OnInitialized()
+    {
+        yorumModel = new YorumModel()
+        {
+            YorumcuAdi = YorumcuAdi,
+            Aciklamasi = Aciklamasi,
+            TarihiText = TarihiText
+        };
+    }
+}

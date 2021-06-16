@@ -85,6 +85,8 @@ namespace OdataApi.Configs
                 endpoints.Count();
                 endpoints.Filter();
 
+                endpoints.SetTimeZoneInfo(TimeZoneInfo.Utc); // Utc: Universal Time Zone, kullanmamızın nedeni time zone'u dikkate almıyoruz
+
                 endpoints.MapControllers();
             });
         }

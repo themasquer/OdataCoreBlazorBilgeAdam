@@ -58,8 +58,7 @@ namespace OdataApi.Controllers
         [EnableQuery]
         //[ODataRoute("yorumlar({yorumId})")] // *1 : Her aksiyonda ODataRoute içerisine "yorumlar" yazmak yerine controller class'ının başına ODataRoutePrefix tanımlayarak (*2) bir aşağıdaki satırdaki gibi ODataRoute tanımlayıp (*2) tekrardan kurtulabiliriz
         [ODataRoute("({yorumId})")] // *2
-        //public IActionResult GetYorum([FromODataUri]int yorumId) // custom route ile parametre kullanımı: aksiyon ismi olarak mutlaka get kullanılmalıdır
-        public IActionResult GetYorum(int yorumId) // [FromODataUri] attribute'u kullanılmadan da yazılabilir
+        public IActionResult GetYorum([FromODataUri]int yorumId) // custom route ile parametre kullanımı: aksiyon ismi olarak mutlaka get kullanılmalıdır
         {
             var query = _yorumService.Query().Where(y => y.Id == yorumId); // Geriye her zaman IQueryable döndüğümüz için where ile filtreliyoruz ve sonuç olarak bir kolleksiyon dönüyor 
             return Ok(query);
@@ -69,39 +68,33 @@ namespace OdataApi.Controllers
 
 
         //[HttpPost] // aksiyon adı aynı olduğu için yazılmasına gerek yoktur
-        //public IActionResult Post([FromBody]YorumModel model) // [FromBody] attribute'unun yazılmasına gerek yoktur
-        public IActionResult Post(YorumModel model)
+        public IActionResult Post([FromBody]YorumModel model)
         {
             if (ModelState.IsValid)
             {
                 _yorumService.Add(model);
-                return Created(model);
+                return Ok(model);
             }
             return BadRequest(ModelState);
         }
 
         //[HttpPut] // aksiyon adı aynı olduğu için yazılmasına gerek yoktur
-        //public IActionResult Put([FromODataUri]int key, [FromBody]YorumModel model) // [FromODataUri] ve [FromBody] attribute'larının yazılmasına gerek yoktur
-        public IActionResult Put(int key, YorumModel model)
+        public IActionResult Put([FromODataUri]int key, [FromBody]YorumModel model)
         {
             if (ModelState.IsValid)
             {
                 model.Id = key;
                 _yorumService.Update(model);
-
-                Request.Headers.Add("Prefer", "return=representation"); // aşağıdaki Updated() methodu ile modeli dönebilmek için eklenmesi gerekmektedir
-
-                return Updated(model);
+                return Ok(model);
             }
             return BadRequest(ModelState);
         }
 
         //[HttpDelete] // aksiyon adı aynı olduğu için yazılmasına gerek yoktur
-        //public IActionResult Delete([FromODataUri]int key) // [FromODataUri] attribute'unun yazılmasına gerek yoktur
-        public IActionResult Delete(int key)
+        public IActionResult Delete([FromODataUri]int key)
         {
             _yorumService.Delete(key);
-            return NoContent();
+            return Ok();
         }
     }
 }

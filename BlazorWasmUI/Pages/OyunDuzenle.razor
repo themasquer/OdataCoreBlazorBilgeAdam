@@ -1,0 +1,108 @@
+﻿@page "/oyunduzenle/{id:int}"
+
+@inject IOyunService OyunService
+@inject IYapimciService YapimciService
+
+@inject IJSRuntime JSRuntime
+
+@inject NavigationManager NavigationManager
+
+<h3>Oyun Düzenleme</h3>
+<hr />
+
+@if (oyunApiModel == null)
+{
+    <p>@AppConfig.Yukleniyor</p>
+}
+else
+{
+    <EditForm Model="@oyunApiModel.Oyun" OnValidSubmit="@GuncelleAsync" autocomplete="off">
+        @if (!string.IsNullOrWhiteSpace(hataMessage))
+        {
+            <p class="hata">@hataMessage</p>
+        }
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <DisplayName For="@(() => oyunApiModel.Oyun.Adi)" />
+            <InputText @bind-Value="@oyunApiModel.Oyun.Adi" class="form-control" placeholder="Oyun adı girin..." />
+            <ValidationMessage For="@(() => oyunApiModel.Oyun.Adi)" />
+        </div>
+        <div class="form-group">
+            <DisplayName For="@(() => oyunApiModel.Oyun.PuaniText)" />
+            <InputText @bind-Value="@oyunApiModel.Oyun.PuaniText" type="number" class="form-control" placeholder="Puanı girin..." />
+            <ValidationMessage For="@(() => oyunApiModel.Oyun.PuaniText)" />
+        </div>
+        <div class="form-group">
+            <DisplayName For="@(() => oyunApiModel.Oyun.YapimciIdText)" />
+            <InputSelect @bind-Value="@oyunApiModel.Oyun.YapimciIdText" class="form-control">
+                <option value="">-- Yapımcı Seçin --</option>
+                @foreach (var yapimci in oyunApiModel.Yapimcilar)
+                {
+                    @if (yapimci.Id == oyunApiModel.Oyun.YapimciId)
+                    {
+                        <option value="@yapimci.Id" selected>@yapimci.Adi</option>
+                    }
+                    else
+                    {
+                        <option value="@yapimci.Id">@yapimci.Adi</option>
+                    }
+                }
+            </InputSelect>
+            <ValidationMessage For="@(() => oyunApiModel.Oyun.YapimciIdText)" />
+        </div>
+        <div class="form-group">
+            <DisplayName For="@(() => oyunApiModel.Oyun.TarihiText)" />
+            <input value="@oyunApiModel.Oyun.TarihiText" onchange="setBlazorDate('BlazorWasmUI', 'SetBlazorDate', this);" class="form-control tarih" placeholder="Tarihi girin..." />
+            <span class="validation-message">@tarihValidationMessage</span>
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-success"><span class="oi oi-check"></span> Güncelle</button>
+            &nbsp;
+            <button @onclick:preventDefault @onclick="@OyunListesineDon" class="btn btn-warning"><span class="oi oi-x"></span> Oyun Listesine Dön</button>
+        </div>
+    </EditForm>
+}
+
+@code
+{
+    private OyunApiModel oyunApiModel;
+    private YapimciApiModel yapimciApiModel;
+    private string hataMessage;
+    private string tarihValidationMessage;
+
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        yapimciApiModel = await YapimciService.GetYapimcilarAsync();
+        oyunApiModel = await OyunService.GetOyunAsync(Id);
+        oyunApiModel.Yapimcilar = yapimciApiModel.Yapimcilar;
+        await JSRuntime.InvokeAsync<object>("setDatePicker", "tarih");
+    }
+
+    private void OyunListesineDon()
+    {
+        NavigationManager.NavigateTo("/oyunlar");
+    }
+
+    private async Task GuncelleAsync()
+    {
+        hataMessage = "";
+        tarihValidationMessage = "";
+        oyunApiModel.Oyun.TarihiText = BlazorBootstrapDatePickerHelper.GetBlazorDate();
+        if (string.IsNullOrWhiteSpace(oyunApiModel.Oyun.TarihiText))
+        {
+            tarihValidationMessage = "Oyun Tarihi zorunludur!";
+            return;
+        }
+        var resultStatusCode = await OyunService.UpdateOyunAsync(oyunApiModel.Oyun);
+        if (resultStatusCode != HttpStatusCode.OK)
+        {
+            hataMessage = AppConfig.Hata;
+            return;
+        }
+        NavigationManager.NavigateTo("/oyunlar");
+    }
+}

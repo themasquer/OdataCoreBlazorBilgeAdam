@@ -106,6 +106,10 @@
             Kullanabilmek için ~/Proje/Configs/OdataConfig.cs Configure methodunda app.UseEndpoints(endpoints =>) içerisine endpoints.Count(); eklenmelidir.
             <br />
             Dönen sonuçta @odata.count kaç kayıt olduğunu gösterir.
+            <br />
+            <a href="/odata/oyunlar/$count" target="_blank">/odata/oyunlar/$count</a>
+            <br />
+            Sadece sorgudan dönen kayıt sayısını almak için kullanılır.
         </li>
         <li>
             FILTER
@@ -140,7 +144,11 @@
             <br />
             <a href="/odata/oyunlar?$filter=adi eq 'red dead redemption 2'" target="_blank">/odata/oyunlar?$filter=adi eq 'red dead redemption 2'</a>
             <br />
-            <a href="/odata/oyunlar?$filter=tarihi ge 2010-01-01T00:00:00.00Z and puani gt 89" target="_blank">/odata/oyunlar?$filter=tarihi ge 2010-01-01T00:00:00.00Z and puani gt 89</a>
+            <a href="/odata/oyunlar?$filter=tarihi ge 2010-01-01T00:00:00Z and puani gt 89" target="_blank">/odata/oyunlar?$filter=tarihi ge 2010-01-01T00:00:00Z and puani gt 89</a>
+            <br />
+            Filtreleme sonucunda sadece dönen kayıt sayısını almak için:
+            <br />
+            <a href="/odata/oyunlar/$count?$filter=tarihi ge 2010-01-01T00:00:00Z and puani gt 89" target="_blank">/odata/oyunlar/$count?$filter=tarihi ge 2010-01-01T00:00:00Z and puani gt 89</a>
             <br />
             <b>Aritmetik (Arithmetic) Operatörler:</b>
             <br />
@@ -192,6 +200,8 @@
             <br />
             <a href="/odata/oyunlar?$filter=year(tarihi) eq 2002&month(tarihi) eq 9&day(tarihi) eq 10" target="_blank">/odata/oyunlar?$filter=year(tarihi) eq 2002&month(tarihi) eq 9&day(tarihi) eq 10</a>
             <br />
+            <a href="/odata/oyunlar?$filter=tarihi ge 2018-10-26T00:00:00Z and tarihi le 2018-10-26T23:59:59Z" target="_blank">/odata/oyunlar?$filter=tarihi ge 2018-10-26T00:00:00Z and tarihi le 2018-10-26T23:59:59Z</a>
+            <br />
             Diğer Fonksiyonlar: cast, isof, any, all
             <br />
             <br />
@@ -203,8 +213,8 @@
         <li>
             QUERY OPTIONS
             <br />
-            <a href="/odata/yorumlar?$orderby=yorumcuadi asc,tarihi asc&$filter=tarihi ge 2010-01-01T00:00:00.00Z" target="_blank">
-                /odata/yorumlar?$orderby=yorumcuadi asc,tarihi asc&$filter=tarihi ge 2010-01-01T00:00:00.00Z
+            <a href="/odata/yorumlar?$orderby=yorumcuadi asc,tarihi asc&$filter=tarihi ge 2010-01-01T00:00:00Z" target="_blank">
+                /odata/yorumlar?$orderby=yorumcuadi asc,tarihi asc&$filter=tarihi ge 2010-01-01T00:00:00Z
             </a>
             <br />
             Kullanabilmek için ilgili controller action'ına ODataQueryOptions tipinde bir parametre gönderilmelidir. Bu durumda EnableQuery attribute'unu kullanmaya gerek yoktur.
@@ -264,7 +274,7 @@
             <br />
             2) Parametreli Function'lar (Devam)
             <br />
-            <a href="/odata/yapimcioyunyorumlar/oyuntarihinegoregetir(oyunbaslangictarihi=2000-01-01T00:00:00.00Z,oyunbitistarihi=2009-12-31T23:59:59.00Z)" target="_blank">/odata/yapimcioyunyorumlar/oyuntarihinegoregetir(oyunbaslangictarihi=2000-01-01T00:00:00.00Z,oyunbitistarihi=2009-12-31T23:59:59.00Z)</a>
+            <a href="/odata/yapimcioyunyorumlar/oyuntarihinegoregetir(oyunbaslangictarihi=2000-01-01T00:00:00Z,oyunbitistarihi=2009-12-31T23:59:59Z)" target="_blank">/odata/yapimcioyunyorumlar/oyuntarihinegoregetir(oyunbaslangictarihi=2000-01-01T00:00:00Z,oyunbitistarihi=2009-12-31T23:59:59Z)</a>
             <br />
             <a href="/odata/yapimcioyunyorumlar/oyuntarihinegoregetir(oyunbaslangictarihi=null,oyunbitistarihi=null)" target="_blank">/odata/yapimcioyunyorumlar/oyuntarihinegoregetir(oyunbaslangictarihi=null,oyunbitistarihi=null)</a>
         </li>
@@ -338,13 +348,11 @@
             <form action="/odata/yapimcioyunyorumlar/tumyapimcioyunyorumlarinigetir" method="post">
                 Yapımcı ID: <input type="text" name="yapimciid" value="2" />
                 <br />
-                Yapımcı Adı: <input type="text" name="yapimciadi" value="Valve" />
-                <br />
                 Oyun Adı: <input type="text" name="oyunadi" value="Half-Life 2" />
                 <br />
-                Oyun Başlangıç Tarihi: <input type="text" name="oyunbaslangictarihi" value="2004-06-22T00:00:00.00Z" />
+                Oyun Başlangıç Tarihi: <input type="text" name="oyunbaslangictarihi" value="2004-06-22T00:00:00Z" />
                 <br />
-                Oyun Bitiş Tarihi: <input type="text" name="oyunbitistarihi" value="2004-06-22T23:59:59.00Z" />
+                Oyun Bitiş Tarihi: <input type="text" name="oyunbitistarihi" value="2004-06-22T23:59:59Z" />
                 <br />
                 Oyun Başlangıç Puanı: <input type="text" name="oyunbaslangicpuani" value="96" />
                 <br />

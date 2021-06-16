@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace OdataApi.Models
@@ -16,5 +17,7 @@ namespace OdataApi.Models
 
         public int YapimciId { get; set; }
         public YapimciModel Yapimci { get; set; }
+
+        public List<YorumModel> Yorumlar { get; set; }
     }
 }

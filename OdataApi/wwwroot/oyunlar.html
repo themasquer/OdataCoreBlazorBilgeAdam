@@ -20,7 +20,7 @@
         <br />
         Puanı: <input type="text" id="cpuani" value="81" />
         <br />
-        Tarihi: <input type="text" id="ctarihi" value="2018-09-20T00:00:00.00Z" />
+        Tarihi: <input type="text" id="ctarihi" value="2018-09-20T00:00:00Z" />
         <br />
         Yapımcı ID: <input type="text" id="cyapimciid" value="3" />
         <br />
@@ -35,7 +35,7 @@
         <br />
         Puanı: <input type="text" id="upuani" value="74" />
         <br />
-        Tarihi: <input type="text" id="utarihi" value="2020-10-09T00:00:00.00Z" />
+        Tarihi: <input type="text" id="utarihi" value="2020-10-09T00:00:00Z" />
         <br />
         Yapımcı ID: <input type="text" id="uyapimciid" value="3" />
         <br />
@@ -56,13 +56,9 @@
                 $.ajax({
                     url: "/odata/oyunlar",
                     type: "post",
-                    data: { adi: $("#cadi").val(), puani: $("#cpuani").val(), tarihi: $("#ctarihi").val(), yapimciid: $("#cyapimciid").val() },
-                    dataType: "json",
+                    data: JSON.stringify({ Adi: $("#cadi").val(), Puani: $("#cpuani").val(), Tarihi: $("#ctarihi").val(), YapimciId: $("#cyapimciid").val() }),
+                    contentType: "application/json",
                     success: function (result) {
-
-                        // End point'te Created methodu gönderdiğimiz tarihe zaman dilimini ekleyerek yanlış tarih döndüğü için tarih verisini dönüştürüyoruz!
-                        result.Tarihi = new Date(result.Tarihi).toISOString(); 
-
                         $("#message").html("İşlem başarılı:<br />" + JSON.stringify(result));
                     },
                     error: function (result) {
@@ -74,13 +70,9 @@
                 $.ajax({
                     url: "/odata/oyunlar(" + $("#uid").val() + ")",
                     type: "put",
-                    data: { adi: $("#uadi").val(), puani: $("#upuani").val(), tarihi: $("#utarihi").val(), yapimciid: $("#uyapimciid").val() },
-                    dataType: "json",
+                    data: JSON.stringify({ Adi: $("#uadi").val(), Puani: $("#upuani").val(), Tarihi: $("#utarihi").val(), YapimciId: $("#uyapimciid").val() }),
+                    contentType: "application/json",
                     success: function (result) {
-
-                        // End point'te Created methodu gönderdiğimiz tarihe zaman dilimini ekleyerek yanlış tarih döndüğü için tarih verisini dönüştürüyoruz!
-                        result.Tarihi = new Date(result.Tarihi).toISOString(); 
-
                         $("#message").html("İşlem başarılı:<br />" + JSON.stringify(result));
                     },
                     error: function (result) {
@@ -95,8 +87,8 @@
                     success: function () {
                         $("#message").html("İşlem başarılı.");
                     },
-                    error: function () {
-                        $("#message").html("İşlem sırasında hata meydana geldi!");
+                    error: function (result) {
+                        $("#message").html("İşlem sırasında hata meydana geldi: " + JSON.stringify(result.responseJSON.error.code) + ": " + JSON.stringify(result.responseJSON.error.message));
                     }
                 });
             });

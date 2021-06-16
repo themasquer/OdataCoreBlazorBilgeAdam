@@ -1,0 +1,51 @@
+﻿@page "/oyunsil/{id:int}"
+
+@inject IOyunService OyunService
+
+@inject NavigationManager NavigationManager
+
+<h3>Oyun Silme</h3>
+<hr />
+
+<OyunDetay Id="@Id" OyunSilmeMi="@true"></OyunDetay>
+
+<hr />
+<div>
+    <p>Oyunu silmek istediğinize emin misiniz?</p>
+    <button @onclick="SilAsync" class="btn btn-danger"><span class="oi oi-check"></span> Evet</button>
+    &nbsp;
+    <button @onclick="@OyunListesineDon" class="btn btn-warning"><span class="oi oi-x"></span> Hayır</button>
+    <br />
+    <br />
+    @if (!string.IsNullOrWhiteSpace(hataMessage))
+    {
+        <p class="hata">@hataMessage</p>
+    }
+</div>
+
+@code
+{
+    private OyunApiModel oyunApiModel;
+    private string hataMessage;
+
+    [Parameter]
+    public int Id { get; set; }
+
+    private async Task SilAsync()
+    {
+        SonucApiModel sonucApiModel = await OyunService.DeleteOyunAsync(Id);
+        if (sonucApiModel.BasariliMi)
+        {
+            NavigationManager.NavigateTo("/oyunlar");
+        }
+        else
+        {
+            hataMessage = sonucApiModel.Hata.Mesaj;
+        }
+    }
+
+    private void OyunListesineDon()
+    {
+        NavigationManager.NavigateTo("/oyunlar");
+    }
+}

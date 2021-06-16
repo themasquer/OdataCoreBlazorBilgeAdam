@@ -30,8 +30,7 @@ namespace OdataApi.Controllers
 
         #region ANAHTAR (ID) ÜZERİNDEN KAYIT ÇEKME
         [EnableQuery]
-        //public IActionResult Get([FromODataUri] int key)
-        public IActionResult Get(int key) // [FromODataUri] attribute'u kullanılmadan da yazılabilir
+        public IActionResult Get([FromODataUri]int key)
         {
             var query = _yapimciService.Query().Where(y => y.Id == key);
             return Ok(query);
@@ -66,39 +65,38 @@ namespace OdataApi.Controllers
 
 
         //[HttpPost] // aksiyon adı aynı olduğu için yazılmasına gerek yoktur
-        //public IActionResult Post([FromBody]YapimciModel model) // [FromBody] attribute'unun yazılmasına gerek yoktur
-        public IActionResult Post(YapimciModel model)
+        public IActionResult Post([FromBody]YapimciModel model)
         {
             if (ModelState.IsValid)
             {
                 _yapimciService.Add(model);
-                return Created(model);
+                return Ok(model);
             }
             return BadRequest(ModelState);
         }
 
         //[HttpPut] // aksiyon adı aynı olduğu için yazılmasına gerek yoktur
-        //public IActionResult Put([FromODataUri]int key, [FromBody]YapimciModel model) // [FromODataUri] ve [FromBody] attribute'larının yazılmasına gerek yoktur
-        public IActionResult Put(int key, YapimciModel model)
+        public IActionResult Put([FromODataUri]int key, [FromBody]YapimciModel model)
         {
             if (ModelState.IsValid)
             {
                 model.Id = key;
                 _yapimciService.Update(model);
-
-                Request.Headers.Add("Prefer", "return=representation"); // aşağıdaki Updated() methodu ile modeli dönebilmek için eklenmesi gerekmektedir
-
-                return Updated(model);
+                return Ok(model);
             }
             return BadRequest(ModelState);
         }
 
         //[HttpDelete] // aksiyon adı aynı olduğu için yazılmasına gerek yoktur
-        //public IActionResult Delete([FromODataUri]int key) // [FromODataUri] attribute'unun yazılmasına gerek yoktur
-        public IActionResult Delete(int key)
+        public IActionResult Delete([FromODataUri]int key)
         {
+            var yapimci = _yapimciService.Query().SingleOrDefault(y => y.Id == key);
+            if (yapimci.Oyunlar?.Count > 0)
+            {
+                return BadRequest("Silinmek istenen yapımcıya ait en az bir oyun bulunduğundan yapımcı silinemez!");
+            }
             _yapimciService.Delete(key);
-            return NoContent();
+            return Ok();
         }
     }
 }

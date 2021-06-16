@@ -28,7 +28,15 @@ namespace OdataApi.Services
                 {
                     Id = o.Yapimci.Id,
                     Adi = o.Yapimci.Adi
-                }
+                },
+                Yorumlar = o.Yorumlar.Select(y => new YorumModel()
+                {
+                    Id = y.Id,
+                    OyunId = y.OyunId,
+                    YorumcuAdi = y.YorumcuAdi,
+                    Aciklamasi = y.Aciklamasi,
+                    Tarihi = y.Tarihi
+                }).ToList()
             });
         }
 

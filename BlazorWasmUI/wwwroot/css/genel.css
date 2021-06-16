@@ -1,0 +1,36 @@
+﻿.ustmenu {
+    display: block !important;
+    padding-top: 15px;
+}
+
+.ustmenu a {
+    margin-right: 15px;
+}
+
+.sayfa {
+    padding-bottom: 15px !important;
+}
+
+.yukleniyor {
+    margin-left: 10px;
+}
+
+.hata {
+    color: red;
+}
+
+.yapimcilar {
+    overflow-y: auto;
+    height: 200px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+    margin-top: 30px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #0275d8;
+}
+
+.yapimci {
+    padding-top: 30px;
+}

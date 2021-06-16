@@ -1,0 +1,40 @@
+﻿@inject IYorumService YorumService
+
+<div>
+    <p><b>@Yorumcu</b> adlı yorumcunun <b>@Tarih</b> tarihinde <b>@Oyun</b> oyunu için<br />girmiş olduğu yorumu silmek istediğinize emin misiniz?</p>
+    <button @onclick="SilAsync" class="btn btn-danger"><span class="oi oi-check"></span> Evet</button>
+    &nbsp;
+    <button @onclick="@IptalAsync" class="btn btn-warning"><span class="oi oi-x"></span> Hayır</button>
+</div>
+
+@code 
+{
+    [CascadingParameter]
+    private BlazoredModalInstance Modal { get; set; }
+
+    [Parameter]
+    public int Id { get; set; }
+
+    [Parameter]
+    public string Yorumcu { get; set; }
+
+    [Parameter]
+    public string Oyun { get; set; }
+
+    [Parameter]
+    public string Tarih { get; set; }
+
+    private async Task SilAsync()
+    {
+        string hataMessage = "";
+        var resultStatusCode = await YorumService.DeleteYorumAsync(Id);
+        if (resultStatusCode != HttpStatusCode.OK)
+            hataMessage = AppConfig.Hata;
+        await Modal.CloseAsync(ModalResult.Ok(hataMessage));
+    }
+
+    private async Task IptalAsync()
+    {
+        await Modal.CloseAsync(ModalResult.Cancel());
+    }
+}

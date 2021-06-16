@@ -1,0 +1,12 @@
+﻿@page "/yorumlar-redirect"
+
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await JSRuntime.InvokeAsync<object>("removeDataTable");
+        NavigationManager.NavigateTo("yorumlar");
+    }
+}

@@ -1,0 +1,134 @@
+﻿@page "/yapimcilar"
+
+@inject IYapimciService YapimciService
+
+@inject IJSRuntime JSRuntime
+
+<h3>Yapımcılar</h3>
+<hr />
+
+@if (yapimciApiModel == null)
+{
+    <p>@AppConfig.Yukleniyor</p>
+}
+else
+{
+    <a href="" @onclick:preventDefault @onclick="@YapimciEkle" title="Yeni Yapımcı"><span class="oi oi-plus"></span> Yeni Yapımcı</a>
+    <hr />
+    if (yapimciApiModel.Yapimcilar != null && yapimciApiModel.Yapimcilar.Count > 0)
+    {
+        <p class="text-success">@yapimciApiModel.Yapimcilar.Count @AppConfig.KayitBulundu</p>
+        <div class="yapimcilar">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th style="width: 85%;">
+                            <DisplayName For="@(() => yapimciApiModel.Yapimcilar.FirstOrDefault().Adi)" />
+                        </th>
+                        <th>
+
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var yapimci in yapimciApiModel.Yapimcilar)
+                    {
+                        <tr>
+                            <td>
+                                @yapimci.Adi
+                            </td>
+                            <td>
+                                <button @onclick="@(() => YapimciDetayiniGetir(yapimci.Id))" class="btn btn-link" title="Yapımcı Detayı"><span class="oi oi-info"></span> Detay</button>
+                                <button @onclick="@(() => YapimciDuzenle(yapimci.Id))" class="btn btn-link" title="Yapımcı Düzenle"><span class="oi oi-pencil"></span> Düzenle</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        if (_yapimciDetayGoster)
+        {
+            <div class="yapimci">
+                <YapimciDetay Id="@_id" Baslik="@_baslik" YapimciDetayMi="@_yapimciDetayMi" YapimciDetayKapat="@Kapat" YapimciDetayKaydedildi="@Kaydedildi"/>
+            </div>
+        }
+    }
+    else
+    {
+        <p class="text-success">@AppConfig.KayitBulunamadi</p>
+    }
+}
+
+@code
+{
+    private YapimciApiModel yapimciApiModel;
+    private int _id;
+    private string _baslik;
+    private bool _yapimciDetayMi;
+    private bool _yapimciDetayGoster;
+
+    protected override async Task OnInitializedAsync()
+    {
+        yapimciApiModel = await YapimciService.GetYapimcilarAsync();
+        _yapimciDetayGoster = false;
+    }
+
+    private void YapimciDetayiniGetir(int id)
+    {
+        _id = id;
+        _baslik = "Yapımcı Detayı";
+        _yapimciDetayMi = true;
+        _yapimciDetayGoster = true;
+    }
+
+    private void YapimciEkle()
+    {
+        _id = 0;
+        _baslik = "Yeni Yapımcı";
+        _yapimciDetayMi = false;
+        _yapimciDetayGoster = true;
+    }
+
+    private void YapimciDuzenle(int id)
+    {
+        _id = id;
+        _baslik = "Yapımcı Düzenleme";
+        _yapimciDetayMi = false;
+        _yapimciDetayGoster = true;
+    }
+
+    private void Kaydedildi(YapimciModel yapimciSonuc)
+    {
+        _yapimciDetayGoster = false;
+        if (_id == 0) // yeni yapımcı
+        {
+            yapimciApiModel.Yapimcilar.Add(yapimciSonuc);
+        }
+        else // mevcut yapımcı
+        {
+            if (!yapimciSonuc.SilindiMi)
+            {
+                bool bulundu = false;
+                for (int i = 0; i < yapimciApiModel.Yapimcilar.Count && !bulundu; i++)
+                {
+                    if (yapimciApiModel.Yapimcilar[i].Id == yapimciSonuc.Id)
+                    {
+                        yapimciApiModel.Yapimcilar[i] = yapimciSonuc;
+                        bulundu = true;
+                    }
+                }
+            }
+            else
+            {
+                YapimciModel silinecekYapimci = yapimciApiModel.Yapimcilar.SingleOrDefault(y => y.Id == yapimciSonuc.Id);
+                yapimciApiModel.Yapimcilar.Remove(silinecekYapimci);
+            }
+        }
+        StateHasChanged(); // model'deki yapımcı listesini kendimiz kod ile değiştirdiğimiz için model'in değiştiğini ve buna göre sayfanın yeniden render edilmesi gerektiğini söylüyoruz.
+    }
+
+    private void Kapat()
+    {
+        _yapimciDetayGoster = false;
+    }
+}

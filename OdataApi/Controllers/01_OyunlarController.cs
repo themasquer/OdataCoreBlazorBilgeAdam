@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNet.OData;
+﻿using System.Linq;
+using Microsoft.AspNet.OData;
 using Microsoft.AspNetCore.Mvc;
 using OdataApi.Models;
 using OdataApi.Services.Bases;
@@ -65,40 +66,52 @@ namespace OdataApi.Controllers
             return Ok(query);
         }
 
+        //[HttpGet]
+        [EnableQuery]
+        public IActionResult Get([FromODataUri]int key)
+        {
+            var query = _oyunService.Query().Where(o => o.Id == key);
+            return Ok(query);
+        }
+
         //[HttpPost] // aksiyon adı aynı olduğu için yazılmasına gerek yoktur
-        //public IActionResult Post([FromBody]OyunModel model) // [FromBody] attribute'unun yazılmasına gerek yoktur
-        public IActionResult Post(OyunModel model)
+        public IActionResult Post([FromBody]OyunModel model)
         {
             if (ModelState.IsValid)
             {
                 _oyunService.Add(model);
-                return Created(model);
+                //return Created(model); // başarılı işlemler için Created da dönülebilir Ok de.
+                return Ok(model);
             }
             return BadRequest(ModelState);
         }
 
         //[HttpPut] // aksiyon adı aynı olduğu için yazılmasına gerek yoktur
-        //public IActionResult Put([FromODataUri]int key, [FromBody]OyunModel model) // [FromODataUri] ve [FromBody] attribute'larının yazılmasına gerek yoktur
-        public IActionResult Put(int key, OyunModel model)
+        public IActionResult Put([FromODataUri]int key, [FromBody]OyunModel model)
         {
             if (ModelState.IsValid)
             {
                 model.Id = key;
                 _oyunService.Update(model);
 
-                Request.Headers.Add("Prefer", "return=representation"); // aşağıdaki Updated() methodu ile modeli dönebilmek için eklenmesi gerekmektedir
-
-                return Updated(model);
+                //Request.Headers.Add("Prefer", "return=representation"); // aşağıdaki Updated() methodu ile modeli dönebilmek için eklenmesi gerekmektedir
+                //return Updated(model); // başarılı işlemler için Updated da dönülebilir Ok de.
+                return Ok(model);
             }
             return BadRequest(ModelState);
         }
 
         //[HttpDelete] // aksiyon adı aynı olduğu için yazılmasına gerek yoktur
-        //public IActionResult Delete([FromODataUri]int key) // [FromODataUri] attribute'unun yazılmasına gerek yoktur
-        public IActionResult Delete(int key)
+        public IActionResult Delete([FromODataUri]int key)
         {
+            var oyun = _oyunService.Query().SingleOrDefault(o => o.Id == key);
+            if (oyun.Yorumlar?.Count > 0)
+            {
+                return BadRequest("Silinmek istenen oyuna ait en az bir yorum bulunduğundan oyun silinemez!");
+            }
             _oyunService.Delete(key);
-            return NoContent();
+            //return NoContent(); // başarılı işlemler için NoContent de dönülebilir Ok de.
+            return Ok();
         }
     }
 }
